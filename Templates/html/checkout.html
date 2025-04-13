@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - eDox Book Store</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="sticky-top bg-white">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <span class="logo-text"><span class="text-primary">e</span>Dox</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="store.html?category=fiction">Fiction</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=non-fiction">Non-Fiction</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=history">History</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=thriller">Thriller</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=poetry">Poetry</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="store.html">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">About Us</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <a href="#" class="cart-icon me-3" id="cartToggle">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">$40.99</span>
+                        </a>
+                        <div class="dropdown" id="userDropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span id="username">John Doe</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                                <li><a class="dropdown-item" href="orders.html">My Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Checkout Content -->
+    <section class="checkout-section py-5">
+        <div class="container">
+            <h2 class="section-title mb-4">Checkout</h2>
+            
+            <!-- Checkout Progress -->
+            <div class="checkout-progress mb-5">
+                <div class="row">
+                    <div class="col-12">
+                        <ul class="progress-steps">
+                            <li class="progress-step active">
+                                <div class="step-number">1</div>
+                                <div class="step-label">Shopping Cart</div>
+                            </li>
+                            <li class="progress-step active">
+                                <div class="step-number">2</div>
+                                <div class="step-label">Checkout</div>
+                            </li>
+                            <li class="progress-step">
+                                <div class="step-number">3</div>
+                                <div class="step-label">Payment</div>
+                            </li>
+                            <li class="progress-step">
+                                <div class="step-number">4</div>
+                                <div class="step-label">Confirmation</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Shipping Address -->
+                    <div class="checkout-card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Shipping Address</h5>
+                            <button class="btn btn-sm btn-outline-primary" id="addNewAddressBtn">
+                                <i class="fas fa-plus me-1"></i> Add New Address
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="saved-addresses mb-4">
+                                <div class="form-check address-card mb-3">
+                                    <input class="form-check-input" type="radio" name="shippingAddress" id="address1" checked>
+                                    <label class="form-check-label address-label" for="address1">
+                                        <div class="address-info">
+                                            <h6 class="mb-1">Home</h6>
+                                            <p class="mb-1">John Doe</p>
+                                            <p class="mb-1">123 Main Street, Apt 4B</p>
+                                            <p class="mb-1">New York, NY 10001</p>
+                                            <p class="mb-0">Phone: (555) 123-4567</p>
+                                        </div>
+                                        <div class="address-actions">
+                                            <button class="btn btn-sm btn-link text-primary">Edit</button>
+                                            <button class="btn btn-sm btn-link text-danger">Delete</button>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="form-check address-card">
+                                    <input class="form-check-input" type="radio" name="shippingAddress" id="address2">
+                                    <label class="form-check-label address-label" for="address2">
+                                        <div class="address-info">
+                                            <h6 class="mb-1">Office</h6>
+                                            <p class="mb-1">John Doe</p>
+                                            <p class="mb-1">456 Business Ave, Suite 200</p>
+                                            <p class="mb-1">New York, NY 10002</p>
+                                            <p class="mb-0">Phone: (555) 987-6543</p>
+                                        </div>
+                                        <div class="address-actions">
+                                            <button class="btn btn-sm btn-link text-primary">Edit</button>
+                                            <button class="btn btn-sm btn-link text-danger">Delete</button>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Shipping Method -->
+                    <div class="checkout-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Shipping Method</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check shipping-method-card mb-3">
+                                <input class="form-check-input" type="radio" name="shippingMethod" id="standardShipping" checked>
+                                <label class="form-check-label shipping-method-label" for="standardShipping">
+                                    <div class="shipping-method-info">
+                                        <h6 class="mb-1">Standard Shipping</h6>
+                                        <p class="mb-0">Delivery in 3-5 business days</p>
+                                    </div>
+                                    <div class="shipping-method-price">
+                                        $5.00
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="form-check shipping-method-card mb-3">
+                                <input class="form-check-input" type="radio" name="shippingMethod" id="expressShipping">
+                                <label class="form-check-label shipping-method-label" for="expressShipping">
+                                    <div class="shipping-method-info">
+                                        <h6 class="mb-1">Express Shipping</h6>
+                                        <p class="mb-0">Delivery in 1-2 business days</p>
+                                    </div>
+                                    <div class="shipping-method-price">
+                                        $12.00
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="form-check shipping-method-card">
+                                <input class="form-check-input" type="radio" name="shippingMethod" id="nextDayShipping">
+                                <label class="form-check-label shipping-method-label" for="nextDayShipping">
+                                    <div class="shipping-method-info">
+                                        <h6 class="mb-1">Next Day Delivery</h6>
+                                        <p class="mb-0">Delivery by tomorrow</p>
+                                    </div>
+                                    <div class="shipping-method-price">
+                                        $20.00
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Notes -->
+                    <div class="checkout-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Order Notes</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="orderNotes" class="form-label">Add any special instructions or notes about your order</label>
+                                <textarea class="form-control" id="orderNotes" rows="3" placeholder="e.g., Leave package at the door, gift wrapping instructions, etc."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-actions d-flex justify-content-between">
+                        <a href="index.html" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                        </a>
+                        <a href="payment.html" class="btn btn-primary">
+                            Proceed to Payment <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <!-- Order Summary -->
+                    <div class="order-summary-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Order Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="order-items mb-4">
+                                <div class="order-item d-flex mb-3">
+                                    <div class="order-item-image me-3">
+                                        <img src="images/book1.png" alt="Abstract Design" class="img-fluid" style="max-width: 60px;">
+                                    </div>
+                                    <div class="order-item-details flex-grow-1">
+                                        <h6 class="order-item-title mb-0">Abstract Design</h6>
+                                        <p class="order-item-meta mb-0">Qty: 1</p>
+                                        <p class="order-item-price mb-0">$15.99</p>
+                                    </div>
+                                </div>
+                                <div class="order-item d-flex">
+                                    <div class="order-item-image me-3">
+                                        <img src="images/book2.png" alt="The Winter" class="img-fluid" style="max-width: 60px;">
+                                    </div>
+                                    <div class="order-item-details flex-grow-1">
+                                        <h6 class="order-item-title mb-0">The Winter</h6>
+                                        <p class="order-item-meta mb-0">Qty: 2</p>
+                                        <p class="order-item-price mb-0">$25.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="promo-code mb-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Promo Code">
+                                    <button class="btn btn-outline-primary" type="button">Apply</button>
+                                </div>
+                            </div>
+                            
+                            <div class="order-summary-details">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Subtotal:</span>
+                                    <span>$40.99</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Shipping:</span>
+                                    <span>$5.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tax:</span>
+                                    <span>$3.69</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between fw-bold">
+                                    <span>Total:</span>
+                                    <span>$49.68</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Secure Checkout -->
+                    <div class="secure-checkout-card">
+                        <div class="card-body">
+                            <h6 class="mb-3">Secure Checkout</h6>
+                            <p class="mb-3">Your payment information is processed securely.</p>
+                            <div class="payment-icons mb-3">
+                                <i class="fab fa-cc-visa me-2"></i>
+                                <i class="fab fa-cc-mastercard me-2"></i>
+                                <i class="fab fa-cc-amex me-2"></i>
+                                <i class="fab fa-cc-paypal"></i>
+                            </div>
+                            <div class="security-badges d-flex align-items-center">
+                                <i class="fas fa-lock me-2"></i>
+                                <span>SSL Secured Checkout</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h5 class="footer-title"><span class="text-primary">e</span>Dox</h5>
+                    <p class="footer-text">
+                        Your one-stop destination for all your book needs. Discover, explore, and purchase books from various genres.
+                    </p>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="store.html">Store</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="footer-title">Categories</h5>
+                    <ul class="footer-links">
+                        <li><a href="store.html?category=fiction">Fiction</a></li>
+                        <li><a href="store.html?category=non-fiction">Non-Fiction</a></li>
+                        <li><a href="store.html?category=history">History</a></li>
+                        <li><a href="store.html?category=thriller">Thriller</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="footer-title">Newsletter</h5>
+                    <p class="footer-text">Subscribe to our newsletter for the latest updates and offers.</p>
+                    <div class="input-group mt-3">
+                        <input type="email" class="form-control" placeholder="Your Email">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2023 eDox Book Store. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="social-links">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/script.js"></script>
+</body>
+</html>

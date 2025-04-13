@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - eDox Book Store</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="sticky-top bg-white">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <span class="logo-text"><span class="text-primary">e</span>Dox</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="store.html?category=fiction">Fiction</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=non-fiction">Non-Fiction</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=history">History</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=thriller">Thriller</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=poetry">Poetry</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="store.html">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="about.html">About Us</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <a href="#" class="cart-icon me-3" id="cartToggle">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">$0.00</span>
+                        </a>
+                        <a href="login.html" class="btn btn-outline-primary" id="loginBtn">Login</a>
+                        <div class="dropdown d-none" id="userDropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span id="username">User</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                                <li><a class="dropdown-item" href="orders.html">My Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- About Banner -->
+    <section class="page-banner">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="page-title">About Us</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">About Us</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="about-content py-5">
+        <div class="container">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="about-image">
+                        <img src="images/about-image.jpg" alt="About eDox" class="img-fluid rounded">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="about-text">
+                        <h2 class="section-title mb-4">Our Story</h2>
+                        <p>Founded in 2010, eDox started as a small bookshop with a big dream: to connect readers with the books they love. What began as a passion project has grown into one of the leading online bookstores, serving customers worldwide.</p>
+                        <p>Our journey has been guided by our love for literature and our commitment to making books accessible to everyone. We believe that books have the power to educate, inspire, and transform lives.</p>
+                        <p>Today, eDox offers millions of titles across various genres, from bestselling fiction to academic textbooks, all at competitive prices and with worldwide shipping.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="mission-vision-card">
+                        <div class="row">
+                            <div class="col-md-6 mb-4 mb-md-0">
+                                <div class="mission-card">
+                                    <h3 class="mb-3">Our Mission</h3>
+                                    <p>To provide readers worldwide with access to a diverse collection of books at affordable prices, while delivering exceptional customer service and fostering a love for reading.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="vision-card">
+                                    <h3 class="mb-3">Our Vision</h3>
+                                    <p>To be the world's most customer-centric bookstore, where customers can find and discover anything they might want to read, and where authors can find a global audience.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="section-title text-center mb-5">Why Choose Us</h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <h4 class="feature-title">Extensive Collection</h4>
+                                <p class="feature-text">Access to millions of books across all genres, including rare and hard-to-find titles.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-shipping-fast"></i>
+                                </div>
+                                <h4 class="feature-title">Fast Shipping</h4>
+                                <p class="feature-text">Reliable worldwide shipping with tracking, ensuring your books arrive safely and on time.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <h4 class="feature-title">Competitive Prices</h4>
+                                <p class="feature-text">Best prices on the market, with regular discounts and special offers for our loyal customers.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title text-center mb-5">Meet Our Team</h2>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="team-card text-center">
+                                <div class="team-image mb-3">
+                                    <img src="images/team-1.jpg" alt="Team Member" class="img-fluid rounded-circle">
+                                </div>
+                                <h4 class="team-name">John Smith</h4>
+                                <p class="team-position">Founder & CEO</p>
+                                <div class="team-social">
+                                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="team-card text-center">
+                                <div class="team-image mb-3">
+                                    <img src="images/team-2.jpg" alt="Team Member" class="img-fluid rounded-circle">
+                                </div>
+                                <h4 class="team-name">Sarah Johnson</h4>
+                                <p class="team-position">Chief Operating Officer</p>
+                                <div class="team-social">
+                                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="team-card text-center">
+                                <div class="team-image mb-3">
+                                    <img src="images/team-3.jpg" alt="Team Member" class="img-fluid rounded-circle">
+                                </div>
+                                <h4 class="team-name">Michael Brown</h4>
+                                <p class="team-position">Head of Marketing</p>
+                                <div class="team-social">
+                                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="team-card text-center">
+                                <div class="team-image mb-3">
+                                    <img src="images/team-4.jpg" alt="Team Member" class="img-fluid rounded-circle">
+                                </div>
+                                <h4 class="team-name">Emily Davis</h4>
+                                <p class="team-position">Customer Service Manager</p>
+                                <div class="team-social">
+                                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h5 class="footer-title"><span class="text-primary">e</span>Dox</h5>
+                    <p class="footer-text">
+                        Your one-stop destination for all your book needs. Discover, explore, and purchase books from various genres.
+                    </p>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="store.html">Store</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="footer-title">Categories</h5>
+                    <ul class="footer-links">
+                        <li><a href="store.html?category=fiction">Fiction</a></li>
+                        <li><a href="store.html?category=non-fiction">Non-Fiction</a></li>
+                        <li><a href="store.html?category=history">History</a></li>
+                        <li><a href="store.html?category=thriller">Thriller</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="footer-title">Newsletter</h5>
+                    <p class="footer-text">Subscribe to our newsletter for the latest updates and offers.</p>
+                    <div class="input-group mt-3">
+                        <input type="email" class="form-control" placeholder="Your Email">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2023 eDox Book Store. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="social-links">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h5 class="mb-0">Your Cart</h5>
+            <button type="button" class="btn-close" id="closeCart"></button>
+        </div>
+        <div class="cart-body" id="cartItems">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-footer">
+            <div class="d-flex justify-content-between mb-3">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">$0.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <span>Shipping:</span>
+                <span>$5.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3 fw-bold">
+                <span>Total:</span>
+                <span id="cartTotal">$0.00</span>
+            </div>
+            <a href="checkout.html" class="btn btn-primary w-100">Checkout</a>
+        </div>
+    </div>
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/script.js"></script>
+</body>
+</html>

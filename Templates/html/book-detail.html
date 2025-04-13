@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Detail - eDox Book Store</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="sticky-top bg-white">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <span class="logo-text"><span class="text-primary">e</span>Dox</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="store.html?category=fiction">Fiction</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=non-fiction">Non-Fiction</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=history">History</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=thriller">Thriller</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=poetry">Poetry</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="store.html">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">About Us</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <a href="#" class="cart-icon me-3" id="cartToggle">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">$0.00</span>
+                        </a>
+                        <a href="login.html" class="btn btn-outline-primary" id="loginBtn">Login</a>
+                        <div class="dropdown d-none" id="userDropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span id="username">User</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                                <li><a class="dropdown-item" href="orders.html">My Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Book Detail Content -->
+    <section class="book-detail-section py-5">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="store.html">Store</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Abstract Design</li>
+                </ol>
+            </nav>
+            
+            <div class="row">
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <div class="book-detail-image">
+                        <img src="images/book1.png" alt="Abstract Design" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="book-detail-info">
+                        <h1 class="book-title mb-2">Abstract Design</h1>
+                        <div class="book-author mb-3">By <a href="#" class="text-primary">John Smith</a></div>
+                        
+                        <div class="book-rating mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                            <span class="ms-2">4.5 (120 reviews)</span>
+                        </div>
+                        
+                        <div class="book-price mb-4">
+                            <span class="current-price">$15.99</span>
+                            <span class="original-price text-decoration-line-through text-muted ms-2">$19.99</span>
+                            <span class="discount-badge ms-2">20% OFF</span>
+                        </div>
+                        
+                        <div class="book-description mb-4">
+                            <p>Starting off in an eighteenth-century London, this book invites readers to an exciting journey. The lifelong fight of main protagonists come solving. The life of the fight against the biggest villains, criminals and cons of his era.</p>
+                            <p>This captivating novel combines historical fiction with thrilling adventure, taking readers on a journey through the dark alleys of London and beyond.</p>
+                        </div>
+                        
+                        <div class="book-meta mb-4">
+                            <div class="row">
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="meta-label">Publisher</div>
+                                    <div class="meta-value">Penguin Books</div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="meta-label">Language</div>
+                                    <div class="meta-value">English</div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="meta-label">Pages</div>
+                                    <div class="meta-value">342</div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="meta-label">Published</div>
+                                    <div class="meta-value">June 2022</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="book-actions">
+                            <div class="row align-items-center">
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <div class="quantity-selector d-flex align-items-center">
+                                        <button class="btn btn-outline-secondary btn-sm" id="decreaseQuantity">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" class="form-control mx-2" id="quantity" value="1" min="1">
+                                        <button class="btn btn-outline-secondary btn-sm" id="increaseQuantity">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="d-flex">
+                                        <button class="btn btn-primary flex-grow-1 me-2" id="addToCartBtn">
+                                            <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                                        </button>
+                                        <button class="btn btn-outline-primary" id="addToWishlistBtn">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="book-share mt-4">
+                            <span class="me-3">Share:</span>
+                            <a href="#" class="social-share-link me-2"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-share-link me-2"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-share-link me-2"><i class="fab fa-pinterest"></i></a>
+                            <a href="#" class="social-share-link"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-12">
+                    <ul class="nav nav-tabs" id="bookDetailTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Description</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews (120)</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="author-tab" data-bs-toggle="tab" data-bs-target="#author" type="button" role="tab" aria-controls="author" aria-selected="false">Author</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-4 border border-top-0 rounded-bottom" id="bookDetailTabsContent">
+                        <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                            <h4>About the Book</h4>
+                            <p>Starting off in an eighteenth-century London, this book invites readers to an exciting journey. The lifelong fight of main protagonists come solving. The life of the fight against the biggest villains, criminals and cons of his era.</p>
+                            <p>In the heart of Georgian London, young Thomas Hawkins finds himself thrust into a world of intrigue and danger when he discovers a mysterious manuscript that could topple the monarchy. As he navigates the treacherous streets of the city, he must forge unlikely alliances and outwit cunning adversaries who will stop at nothing to possess the manuscript's secrets.</p>
+                            <p>With its richly detailed historical setting, complex characters, and fast-paced plot, "Abstract Design" offers readers an immersive experience into a pivotal moment in history while exploring timeless themes of loyalty, courage, and the pursuit of justice.</p>
+                            
+                            <h5 class="mt-4">Key Features</h5>
+                            <ul>
+                                <li>Meticulously researched historical setting</li>
+                                <li>Complex, multi-dimensional characters</li>
+                                <li>Intricate plot with unexpected twists</li>
+                                <li>Exploration of social and political issues of the era</li>
+                                <li>Blend of historical fact and compelling fiction</li>
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                            <div class="reviews-summary mb-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3 text-center">
+                                        <div class="overall-rating">
+                                            <h2 class="mb-0">4.5</h2>
+                                            <div class="stars mb-2">
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star-half-alt text-warning"></i>
+                                            </div>
+                                            <p class="text-muted">Based on 120 reviews</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="rating-bars">
+                                            <div class="rating-bar d-flex align-items-center mb-2">
+                                                <span class="me-2">5</span>
+                                                <i class="fas fa-star text-warning me-2"></i>
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
+                                                </div>
+                                                <span>75%</span>
+                                            </div>
+                                            <div class="rating-bar d-flex align-items-center mb-2">
+                                                <span class="me-2">4</span>
+                                                <i class="fas fa-star text-warning me-2"></i>
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" style="width: 15%"></div>
+                                                </div>
+                                                <span>15%</span>
+                                            </div>
+                                            <div class="rating-bar d-flex align-items-center mb-2">
+                                                <span class="me-2">3</span>
+                                                <i class="fas fa-star text-warning me-2"></i>
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 7%"></div>
+                                                </div>
+                                                <span>7%</span>
+                                            </div>
+                                            <div class="rating-bar d-flex align-items-center mb-2">
+                                                <span class="me-2">2</span>
+                                                <i class="fas fa-star text-warning me-2"></i>
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 2%"></div>
+                                                </div>
+                                                <span>2%</span>
+                                            </div>
+                                            <div class="rating-bar d-flex align-items-center">
+                                                <span class="me-2">1</span>
+                                                <i class="fas fa-star text-warning me-2"></i>
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 1%"></div>
+                                                </div>
+                                                <span>1%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="reviews-list">
+                                <div class="review-item mb-4 pb-4 border-bottom">
+                                    <div class="d-flex">
+                                        <div class="reviewer-avatar me-3">
+                                            <img src="images/avatar-1.jpg" alt="Reviewer" class="rounded-circle" width="60" height="60">
+                                        </div>
+                                        <div class="review-content">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h5 class="reviewer-name mb-0">Michael Johnson</h5>
+                                                <div class="review-date text-muted">June 15, 2023</div>
+                                            </div>
+                                            <div class="review-rating mb-2">
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                            </div>
+                                            <p class="review-text">This book completely captivated me from the first page. The author's attention to historical detail is impressive, and the characters feel so real and complex. I couldn't put it down and finished it in two days!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="review-item mb-4 pb-4 border-bottom">
+                                    <div class="d-flex">
+                                        <div class="reviewer-avatar me-3">
+                                            <img src="images/avatar-2.jpg" alt="Reviewer" class="rounded-circle" width="60" height="60">
+                                        </div>
+                                        <div class="review-content">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h5 class="reviewer-name mb-0">Sarah Williams</h5>
+                                                <div class="review-date text-muted">May 28, 2023</div>
+                                            </div>
+                                            <div class="review-rating mb-2">
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="far fa-star text-warning"></i>
+                                            </div>
+                                            <p class="review-text">A fascinating historical thriller that kept me engaged throughout. The plot is intricate and well-crafted, though I found some of the side characters underdeveloped. Overall, a great read that I would recommend to any history buff.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="review-item">
+                                    <div class="d-flex">
+                                        <div class="reviewer-avatar me-3">
+                                            <img src="images/avatar-3.jpg" alt="Reviewer" class="rounded-circle" width="60" height="60">
+                                        </div>
+                                        <div class="review-content">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h5 class="reviewer-name mb-0">David Thompson</h5>
+                                                <div class="review-date text-muted">May 10, 2023</div>
+                                            </div>
+                                            <div class="review-rating mb-2">
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star-half-alt text-warning"></i>
+                                            </div>
+                                            <p class="review-text">John Smith has outdone himself with "Abstract Design." The way he brings 18th century London to life is remarkable, and the protagonist's journey is both thrilling and emotionally resonant. The pacing is perfect, with just the right balance of action, intrigue, and character development.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="write-review mt-5">
+                                <h4 class="mb-4">Write a Review</h4>
+                                <form id="reviewForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Your Rating</label>
+                                        <div class="rating-select">
+                                            <i class="far fa-star rating-star" data-rating="1"></i>
+                                            <i class="far fa-star rating-star" data-rating="2"></i>
+                                            <i class="far fa-star rating-star" data-rating="3"></i>
+                                            <i class="far fa-star rating-star" data-rating="4"></i>
+                                            <i class="far fa-star rating-star" data-rating="5"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reviewTitle" class="form-label">Review Title</label>
+                                        <input type="text" class="form-control" id="reviewTitle" placeholder="Give your review a title">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reviewText" class="form-label">Your Review</label>
+                                        <textarea class="form-control" id="reviewText" rows="5" placeholder="Write your review here..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="author" role="tabpanel" aria-labelledby="author-tab">
+                            <div class="author-info">
+                                <div class="row">
+                                    <div class="col-md-3 mb-4 mb-md-0">
+                                        <img src="images/author.jpg" alt="John Smith" class="img-fluid rounded">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h3 class="author-name">John Smith</h3>
+                                        <p class="author-bio">
+                                            John Smith is an award-winning author of historical fiction and thrillers. Born in Edinburgh, Scotland, he developed a passion for history and storytelling at an early age. After studying History at Oxford University, he worked as a museum curator before turning to writing full-time.
+                                        </p>
+                                        <p>
+                                            His debut novel, "The Clockmaker's Daughter," won the Historical Fiction Award in 2018, and his books have been translated into 28 languages. Known for his meticulous research and vivid prose, Smith brings historical periods to life with remarkable authenticity and creates characters that resonate with readers long after they've finished his books.
+                                        </p>
+                                        <p>
+                                            When not writing, John enjoys traveling to historical sites, collecting antique books, and giving lectures on history and the craft of writing. He currently lives in London with his wife and two children.
+                                        </p>
+                                        <div class="author-social mt-3">
+                                            <a href="#" class="social-link me-3"><i class="fab fa-facebook-f"></i></a>
+                                            <a href="#" class="social-link me-3"><i class="fab fa-twitter"></i></a>
+                                            <a href="#" class="social-link me-3"><i class="fab fa-instagram"></i></a>
+                                            <a href="#" class="social-link"><i class="fas fa-globe"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="mt-5 mb-4">Other Books by John Smith</h4>
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-6 mb-4">
+                                        <div class="book-card">
+                                            <div class="book-image">
+                                                <img src="images/book2.png" alt="The Winter" class="img-fluid">
+                                            </div>
+                                            <div class="book-info">
+                                                <h5 class="book-title">The Winter</h5>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="book-price">$12.50</span>
+                                                    <button class="btn btn-sm btn-primary add-to-cart" data-id="2">
+                                                        <i class="fas fa-shopping-cart me-1"></i> Add
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 mb-4">
+                                        <div class="book-card">
+                                            <div class="book-image">
+                                                <img src="images/book3.png" alt="The Birds" class="img-fluid">
+                                            </div>
+                                            <div class="book-info">
+                                                <h5 class="book-title">The Birds</h5>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="book-price">$18.75</span>
+                                                    <button class="btn btn-sm btn-primary add-to-cart" data-id="3">
+                                                        <i class="fas fa-shopping-cart me-1"></i> Add
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related Books -->
+            <div class="related-books mt-5">
+                <h3 class="section-title mb-4">You May Also Like</h3>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="book-card">
+                            <div class="book-image">
+                                <img src="images/book4.png" alt="Science" class="img-fluid">
+                            </div>
+                            <div class="book-info">
+                                <h5 class="book-title">Science</h5>
+                                <p class="book-author">By Robert Brown</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="book-price">$14.99</span>
+                                    <button class="btn btn-sm btn-primary add-to-cart" data-id="4">
+                                        <i class="fas fa-shopping-cart me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="book-card">
+                            <div class="book-image">
+                                <img src="images/book5.png" alt="Black Night" class="img-fluid">
+                            </div>
+                            <div class="book-info">
+                                <h5 class="book-title">Black Night</h5>
+                                <p class="book-author">By Emily Davis</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="book-price">$16.50</span>
+                                    <button class="btn btn-sm btn-primary add-to-cart" data-id="5">
+                                        <i class="fas fa-shopping-cart me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="book-card">
+                            <div class="book-image">
+                                <img src="images/book6.png" alt="Murdering" class="img-fluid">
+                            </div>
+                            <div class="book-info">
+                                <h5 class="book-title">Murdering</h5>
+                                <p class="book-author">By James Wilson</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="book-price">$19.99</span>
+                                    <button class="btn btn-sm btn-primary add-to-cart" data-id="6">
+                                        <i class="fas fa-shopping-cart me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="book-card">
+                            <div class="book-image">
+                                <img src="images/book7.png" alt="Everything N" class="img-fluid">
+                            </div>
+                            <div class="book-info">
+                                <h5 class="book-title">Everything N</h5>
+                                <p class="book-author">By Laura Thompson</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="book-price">$13.25</span>
+                                    <button class="btn btn-sm btn-primary add-to-cart" data-id="7">
+                                        <i class="fas fa-shopping-cart me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h5 class="footer-title"><span class="text-primary">e</span>Dox</h5>
+                    <p class="footer-text">
+                        Your one-stop destination for all your book needs. Discover, explore, and purchase books from various genres.
+                    </p>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="store.html">Store</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="footer-title">Categories</h5>
+                    <ul class="footer-links">
+                        <li><a href="store.html?category=fiction">Fiction</a></li>
+                        <li><a href="store.html?category=non-fiction">Non-Fiction</a></li>
+                        <li><a href="store.html?category=history">History</a></li>
+                        <li><a href="store.html?category=thriller">Thriller</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="footer-title">Newsletter</h5>
+                    <p class="footer-text">Subscribe to our newsletter for the latest updates and offers.</p>
+                    <div class="input-group mt-3">
+                        <input type="email" class="form-control" placeholder="Your Email">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2023 eDox Book Store. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="social-links">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h5 class="mb-0">Your Cart</h5>
+            <button type="button" class="btn-close" id="closeCart"></button>
+        </div>
+        <div class="cart-body" id="cartItems">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-footer">
+            <div class="d-flex justify-content-between mb-3">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">$0.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <span>Shipping:</span>
+                <span>$5.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3 fw-bold">
+                <span>Total:</span>
+                <span id="cartTotal">$0.00</span>
+            </div>
+            <a href="checkout.html" class="btn btn-primary w-100">Checkout</a>
+        </div>
+    </div>
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/script.js"></script>
+</body>
+</html>

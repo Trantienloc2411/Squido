@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Detail - eDox Book Store</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="sticky-top bg-white">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <span class="logo-text"><span class="text-primary">e</span>Dox</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="store.html?category=fiction">Fiction</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=non-fiction">Non-Fiction</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=history">History</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=thriller">Thriller</a></li>
+                                <li><a class="dropdown-item" href="store.html?category=poetry">Poetry</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="store.html">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">About Us</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <a href="#" class="cart-icon me-3" id="cartToggle">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">$0.00</span>
+                        </a>
+                        <div class="dropdown" id="userDropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span id="username">John Doe</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                                <li><a class="dropdown-item" href="orders.html">My Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Order Detail Content -->
+    <section class="order-detail-section py-5">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="profile.html">My Account</a></li>
+                    <li class="breadcrumb-item"><a href="orders.html">My Orders</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Order #ORD12345</li>
+                </ol>
+            </nav>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="order-detail-header mb-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <h2 class="order-title mb-3 mb-md-0">Order #ORD12345</h2>
+                            <div class="order-status">
+                                <span class="badge bg-success">Delivered</span>
+                                <span class="order-date ms-2">June 15, 2023</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Order Items -->
+                    <div class="order-items-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Order Items</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="order-item d-flex flex-column flex-md-row mb-4 pb-4 border-bottom">
+                                <div class="order-item-image me-md-4 mb-3 mb-md-0">
+                                    <img src="images/book1.png" alt="Abstract Design" class="img-fluid" style="max-width: 100px;">
+                                </div>
+                                <div class="order-item-details flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="order-item-title mb-0">Abstract Design</h5>
+                                        <span class="order-item-price">$15.99</span>
+                                    </div>
+                                    <p class="order-item-author text-muted">By John Smith</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="order-item-quantity">Quantity: 1</div>
+                                        <a href="book-detail.html" class="btn btn-sm btn-outline-primary">View Product</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="order-item d-flex flex-column flex-md-row">
+                                <div class="order-item-image me-md-4 mb-3 mb-md-0">
+                                    <img src="images/book2.png" alt="The Winter" class="img-fluid" style="max-width: 100px;">
+                                </div>
+                                <div class="order-item-details flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="order-item-title mb-0">The Winter</h5>
+                                        <span class="order-item-price">$12.50</span>
+                                    </div>
+                                    <p class="order-item-author text-muted">By Sarah Johnson</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="order-item-quantity">Quantity: 2</div>
+                                        <a href="book-detail.html" class="btn btn-sm btn-outline-primary">View Product</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Shipping Information -->
+                    <div class="shipping-info-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Shipping Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-4 mb-md-0">
+                                    <h6 class="mb-3">Shipping Address</h6>
+                                    <p class="mb-1">John Doe</p>
+                                    <p class="mb-1">123 Main Street, Apt 4B</p>
+                                    <p class="mb-1">New York, NY 10001</p>
+                                    <p class="mb-1">United States</p>
+                                    <p class="mb-0">Phone: (555) 123-4567</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Shipping Method</h6>
+                                    <p class="mb-1">Standard Shipping</p>
+                                    <p class="mb-1">Estimated Delivery: 3-5 business days</p>
+                                    <p class="mb-0">Tracking Number: <a href="#" class="text-primary">TRK9876543210</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Timeline -->
+                    <div class="order-timeline-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Order Timeline</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="timeline">
+                                <li class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Order Delivered</h6>
+                                        <p class="timeline-date">June 15, 2023 - 10:30 AM</p>
+                                        <p class="timeline-text">Your order has been delivered successfully.</p>
+                                    </div>
+                                </li>
+                                <li class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Out for Delivery</h6>
+                                        <p class="timeline-date">June 15, 2023 - 8:15 AM</p>
+                                        <p class="timeline-text">Your order is out for delivery.</p>
+                                    </div>
+                                </li>
+                                <li class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Arrived at Local Facility</h6>
+                                        <p class="timeline-date">June 14, 2023 - 7:45 PM</p>
+                                        <p class="timeline-text">Your order has arrived at the local delivery facility.</p>
+                                    </div>
+                                </li>
+                                <li class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Order Shipped</h6>
+                                        <p class="timeline-date">June 12, 2023 - 2:30 PM</p>
+                                        <p class="timeline-text">Your order has been shipped.</p>
+                                    </div>
+                                </li>
+                                <li class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Order Processed</h6>
+                                        <p class="timeline-date">June 11, 2023 - 10:15 AM</p>
+                                        <p class="timeline-text">Your order has been processed and is being prepared for shipment.</p>
+                                    </div>
+                                </li>
+                                <li class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Payment Confirmed</h6>
+                                        <p class="timeline-date">June 10, 2023 - 3:45 PM</p>
+                                        <p class="timeline-text">Your payment has been confirmed.</p>
+                                    </div>
+                                </li>
+                                <li class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Order Placed</h6>
+                                        <p class="timeline-date">June 10, 2023 - 3:30 PM</p>
+                                        <p class="timeline-text">Your order has been placed successfully.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <!-- Order Summary -->
+                    <div class="order-summary-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Order Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>$40.99</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span>$5.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax:</span>
+                                <span>$3.69</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Total:</span>
+                                <span>$49.68</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Information -->
+                    <div class="payment-info-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Payment Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="payment-method mb-3">
+                                <h6 class="mb-2">Payment Method</h6>
+                                <div class="d-flex align-items-center">
+                                    <i class="fab fa-cc-visa me-2 text-primary fs-4"></i>
+                                    <div>
+                                        <p class="mb-0">Visa ending in 4567</p>
+                                        <p class="mb-0 text-muted">Expires 05/25</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="billing-address">
+                                <h6 class="mb-2">Billing Address</h6>
+                                <p class="mb-1">John Doe</p>
+                                <p class="mb-1">123 Main Street, Apt 4B</p>
+                                <p class="mb-1">New York, NY 10001</p>
+                                <p class="mb-0">United States</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="order-actions-card">
+                        <div class="card-body">
+                            <a href="#" class="btn btn-primary w-100 mb-3">
+                                <i class="fas fa-download me-2"></i> Download Invoice
+                            </a>
+                            <a href="contact.html" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-question-circle me-2"></i> Need Help?
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h5 class="footer-title"><span class="text-primary">e</span>Dox</h5>
+                    <p class="footer-text">
+                        Your one-stop destination for all your book needs. Discover, explore, and purchase books from various genres.
+                    </p>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="store.html">Store</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="footer-title">Categories</h5>
+                    <ul class="footer-links">
+                        <li><a href="store.html?category=fiction">Fiction</a></li>
+                        <li><a href="store.html?category=non-fiction">Non-Fiction</a></li>
+                        <li><a href="store.html?category=history">History</a></li>
+                        <li><a href="store.html?category=thriller">Thriller</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="footer-title">Newsletter</h5>
+                    <p class="footer-text">Subscribe to our newsletter for the latest updates and offers.</p>
+                    <div class="input-group mt-3">
+                        <input type="email" class="form-control" placeholder="Your Email">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2023 eDox Book Store. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="social-links">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h5 class="mb-0">Your Cart</h5>
+            <button type="button" class="btn-close" id="closeCart"></button>
+        </div>
+        <div class="cart-body" id="cartItems">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-footer">
+            <div class="d-flex justify-content-between mb-3">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">$0.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <span>Shipping:</span>
+                <span>$5.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3 fw-bold">
+                <span>Total:</span>
+                <span id="cartTotal">$0.00</span>
+            </div>
+            <a href="checkout.html" class="btn btn-primary w-100">Checkout</a>
+        </div>
+    </div>
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/script.js"></script>
+</body>
+</html>
