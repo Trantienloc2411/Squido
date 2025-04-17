@@ -1,0 +1,8 @@
+﻿@model SharedViewModal.ViewModels.HomeViewModal
+@foreach (var result in Model.Categories)
+{
+    <li>
+        <a class="dropdown-item" href="store.html?category=fiction">@result.Name</a
+        >
+    </li>
+}

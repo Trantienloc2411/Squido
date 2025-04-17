@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MVCWithApi" type="CompoundRunConfigurationType">
+    <toRun name="Squido: http" type="LaunchSettings" />
+    <toRun name="WebApplication1: http" type="LaunchSettings" />
+    <method v="2" />
+  </configuration>
+</component>

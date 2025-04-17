@@ -1,0 +1,191 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SharedViewModal.ViewModels.PaginationViewModel<SharedViewModal.ViewModels.BookViewModel>?
+@{
+    ViewData["Title"] = "Store";
+}
+<section class="page-banner position-relative overflow-hidden py-5">
+    <!-- Background Image -->
+    <div class="banner-bg position-absolute end-0 top-0 z-0 d-none d-lg-block">
+        <img src="~/images/quentin-schulz-HIhcvRm_yQ8-unsplash.jpg" alt="Book Store Banner" class="img-fluid"
+             style=" opacity: 0.6;">
+    </div>
+
+
+    <div class="container position-relative z-1">
+        <div class="row">
+            <div class="col-lg-7">
+                <h1 class="store-title fw-bold title-text text-light">Book Store</h1>
+                <p class="banner-text text-light">
+                    Browse our extensive collection of books across all genres and discover your next favorite read.
+                </p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Store Content -->
+<section class="store-content py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <div class="col-lg-3">
+                <form method="get" asp-controller="Home" asp-action="Filter">
+                    <div class="filter-card">
+                        <h5 class="filter-title">Categories</h5>
+                        <div class="filter-body">
+                            @foreach (var item in Model.Categories)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input category-checkbox" type="checkbox" name="categories"
+                                           value="@item.CategoryId" id="cat-@item.CategoryId">
+                                    <label class="form-check-label" for="@item.CategoryId">
+                                        @item.Name - @item.CategoryId
+                                    </label>
+                                </div>
+                            }
+
+
+                        </div>
+                    </div>
+                    <div class="filter-card mt-4">
+                        <h5 class="filter-title">Price Range</h5>
+                        <div class="filter-body">
+                            <div class="price-range">
+                                <input type="range" class="form-range" min="0" max="100" id="priceRange">
+                                <div class="d-flex justify-content-between">
+                                    <span>$0</span>
+                                    <span>$100</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @* <div class="filter-card mt-4"> *@
+                    @*     <h5 class="filter-title">Rating</h5> *@
+                    @*     <div class="filter-body"> *@
+                    @*         <div class="form-check"> *@
+                    @*             <input class="form-check-input" type="checkbox" value="" id="rating5"> *@
+                    @*             <label class="form-check-label" for="rating5"> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*             </label> *@
+                    @*         </div> *@
+                    @*         <div class="form-check"> *@
+                    @*             <input class="form-check-input" type="checkbox" value="" id="rating4"> *@
+                    @*             <label class="form-check-label" for="rating4"> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="far fa-star text-warning"></i> *@
+                    @*             </label> *@
+                    @*         </div> *@
+                    @*         <div class="form-check"> *@
+                    @*             <input class="form-check-input" type="checkbox" value="" id="rating3"> *@
+                    @*             <label class="form-check-label" for="rating3"> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="fas fa-star text-warning"></i> *@
+                    @*                 <i class="far fa-star text-warning"></i> *@
+                    @*                 <i class="far fa-star text-warning"></i> *@
+                    @*             </label> *@
+                    @*         </div> *@
+                    @*     </div> *@
+                    @* </div> *@
+
+                    
+
+                    <button class="btn btn-primary w-100 mt-4">Apply Filters</button>
+                </form>
+
+
+            </div>
+            
+
+            <!-- Product Grid -->
+            <div class="col-lg-9">
+                <div class="store-header d-flex justify-content-between align-items-center mb-4">
+                    <form method="get" asp-controller="Home" asp-action="Search">
+                        <div class="search-box mt-3">
+                            <div class="input-group shadow rounded-pill overflow-hidden">
+                                <input
+                                    type="text"
+                                    name="keyword"
+                                    value="@ViewBag.Keyword"
+                                    class="form-control border-0 ps-4 py-3"
+                                    placeholder="Search Here"
+                                />
+                                <button class="btn btn-primary px-3" type="submit">
+                                    <i class="fas fa-search me-2"></i> Find Book
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="sort-options d-flex align-items-center">
+                        <label class="me-2">Sort by:</label>
+                        <select class="form-select form-select-sm">
+                            <option selected>Popularity</option>
+                            <option>Price: Low to High</option>
+                            <option>Price: High to Low</option>
+                            <option>Newest First</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" id="productGrid">
+                    <!-- Products will be dynamically loaded here -->
+                    @foreach (var item in Model.Data)
+                    {
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="book-card">
+                                <a class="text-decoration-none text-black" asp-controller="Book" asp-action="Details"
+                                   asp-route-id="@item.BookId">
+                                    <div class="book-image">
+                                        <img src="~/images/1_.jpg" alt="@item.Title" class="img-fluid">
+                                    </div>
+                                    <div class="book-info">
+                                        <h5 class="book-title">@item.Title</h5>
+                                        <p class="book-author">By <span class="fw-bold ">@item.AuthorName </span> -
+                                            <span class="text-muted fst-italic">@item.CategoryName</span></p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="book-price">$@item.Price</span>
+                                            <button class="btn btn-sm btn-primary add-to-cart" data-id="3">
+                                                <i class="fas fa-shopping-cart me-1"></i> Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- More products would be added here -->
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        @for (var i = 1; i <= Model.PageCount; i++)
+                        {
+                            <li class="page-item active"><a class="page-link" 
+                                                            asp-route-keyword="@ViewBag.Keyword" 
+                                                            asp-page="/store"
+                                                            asp-route-currentpage="@i"
+                                                            
+                                                            >@i</a></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
