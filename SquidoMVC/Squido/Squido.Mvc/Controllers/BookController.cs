@@ -8,6 +8,7 @@ namespace Squido.Controllers;
 
 public class BookController(IHttpClientFactory clientFactory) : Controller
 {
+    
 
     public async Task<IActionResult> Details(string id)
     {

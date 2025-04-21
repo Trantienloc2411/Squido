@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using SharedViewModal.ViewModels;
-using Squido.Models.Entities;
+using WebApplication1.Models.Entities;
 using WebApplication1.DAOs.Interfaces;
 using WebApplication1.Services.Interfaces;
 

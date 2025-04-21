@@ -2,10 +2,10 @@
 using System.Linq.Expressions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Squido.DAOs.Interfaces;
-using Squido.Models;
+using WebApplication1.DAOs.Interfaces;
+using WebApplication1.Models;
 
-namespace Squido.DAOs.Repositories;
+namespace WebApplication1.DAOs.Repositories;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
@@ -101,6 +101,16 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _dbSet.Remove(entityToDelete);
     }
 
+    public async Task AddAsync(T entity)
+    {
+        await _dbSet.AddAsync(entity);
+    }
+
+    public async Task DeleteAsync(T entity)
+    {
+        await Task.Run(() => _dbSet.Remove(entity));
+    }
+
     public virtual void Update(T entityToUpdate)
     {
         var trackedEntities = _context.ChangeTracker.Entries<T>().ToList();
@@ -148,7 +158,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         _dbSet.AddRange(entities);
     }
-    
+
     public IEnumerable<TResult> ExecuteStoredProcedure<TResult>(string storedProcedure, params SqlParameter[] parameters) where TResult : class, new()
     {
         using (var command = _context.Database.GetDbConnection().CreateCommand())

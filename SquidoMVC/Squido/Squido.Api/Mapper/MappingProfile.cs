@@ -1,7 +1,7 @@
 using AutoMapper;
+using SharedViewModal.RequestViewModal;
 using SharedViewModal.ViewModels;
-using Squido.Models.Entities;
-
+using WebApplication1.Models.Entities;
 namespace WebApplication1.Mapper;
 
 public class MappingProfile : Profile
@@ -18,5 +18,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.CategoryId, 
                 opt => opt.MapFrom(src => src.Id))
             .ReverseMap();
+
+        CreateMap<User, UserViewModel>()
+            .ReverseMap();
+
+        CreateMap<User, RegisterRequestVm>().ReverseMap();
+        CreateMap<Role, RoleViewModel>().ReverseMap();  
+
     }
 }

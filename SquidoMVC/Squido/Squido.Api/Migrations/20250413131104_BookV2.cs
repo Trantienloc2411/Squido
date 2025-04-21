@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Squido.Migrations
+namespace WebApplication1.Migrations
 {
     /// <inheritdoc />
     public partial class BookV2 : Migration

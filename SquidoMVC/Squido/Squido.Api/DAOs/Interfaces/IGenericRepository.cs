@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.Data.SqlClient;
 
-namespace Squido.DAOs.Interfaces;
+namespace WebApplication1.DAOs.Interfaces;
 
 public interface IGenericRepository<T> where T : class
 {
@@ -13,6 +13,9 @@ public interface IGenericRepository<T> where T : class
         int? pageSize = null);
 
     T GetByID(object id);
+    Task AddAsync(T entity);
+    Task DeleteAsync(T entity);
+    void Update(T entity);
 
     void Insert(T entity);
 
@@ -20,7 +23,6 @@ public interface IGenericRepository<T> where T : class
 
     void Delete(T entityToDelete);
     bool Update(object id, T entityToUpdate);
-    void Update(T entityToUpdate);
 
     IEnumerable<T> GetAll();
     IEnumerable<TResult> ExecuteStoredProcedure<TResult>(string storedProcedure, params SqlParameter[] parameters) where TResult : class, new();

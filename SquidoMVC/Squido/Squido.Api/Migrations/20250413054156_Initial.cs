@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Squido.Migrations
+namespace WebApplication1.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration

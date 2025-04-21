@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Squido.Models.Entities;
+namespace   WebApplication1.Models.Entities;
 
 public class Rating
 {
@@ -9,9 +9,9 @@ public class Rating
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string Id { get; set; }
         
-    public string OrderItemId { get; set; }
+    public Guid OrderItemId { get; set; }
         
-    public string CustomerId { get; set; }
+    public Guid CustomerId { get; set; }
         
     public int RatingValue { get; set; }
         

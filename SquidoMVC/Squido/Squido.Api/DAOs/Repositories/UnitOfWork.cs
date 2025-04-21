@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Squido.DAOs.Interfaces;
-using Squido.DAOs.Repositories;
-using Squido.Models;
-using Squido.Models.Entities;
 using WebApplication1.DAOs.Interfaces;
+
+using WebApplication1.Models;
+using WebApplication1.Models.Entities;
 
 namespace WebApplication1.DAOs.Repositories;
 
-public class UnitOfWork  : IUnitOfWork
+public class UnitOfWork(SquidoDbContext context) : IUnitOfWork
 {
-    private readonly SquidoDbContext _context;
+    private readonly SquidoDbContext _context = context;
     private GenericRepository<Book>? _bookRepository;
     private GenericRepository<ImageBook>? _imageBookRepository;
     private GenericRepository<Role>? _roleRepository;
@@ -18,13 +17,9 @@ public class UnitOfWork  : IUnitOfWork
     private GenericRepository<Order>? _orderRepository;
     private GenericRepository<OrderItem> _orderItemRepository;
     private GenericRepository<Rating>? _ratingRepository;
-
-    public UnitOfWork(SquidoDbContext context)
-    {
-        _context = context;
-      
-    }
-
+    private GenericRepository<Author>? _authorRepository;
+    private GenericRepository<RefreshToken>? _refreshTokenRepository;
+ 
     public IGenericRepository<Book> BookRepository
     {
         get
@@ -88,6 +83,22 @@ public class UnitOfWork  : IUnitOfWork
             return _imageBookRepository ??= new GenericRepository<ImageBook>(_context);
         }
     }
+
+    public IGenericRepository<Author> AuthorRepository
+    {
+        get
+        {
+            return _authorRepository ??= new GenericRepository<Author>(_context);
+        }
+    }    
+
+    public IGenericRepository<RefreshToken> RefreshTokenRepository
+    {
+        get
+        {
+            return _refreshTokenRepository ??= new GenericRepository<RefreshToken>(_context);
+        }
+    }   
 
     public void Save()
     {

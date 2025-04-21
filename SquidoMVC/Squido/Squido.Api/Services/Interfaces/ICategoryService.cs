@@ -1,5 +1,5 @@
 ﻿using SharedViewModal.ViewModels;
-using Squido.Models.Entities;
+using WebApplication1.Models.Entities;
 
 namespace WebApplication1.Services.Interfaces;
 

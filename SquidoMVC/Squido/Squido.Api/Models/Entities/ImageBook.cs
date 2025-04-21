@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Squido.Models.Entities;
+namespace WebApplication1.Models.Entities;
 
 public class ImageBook
 {

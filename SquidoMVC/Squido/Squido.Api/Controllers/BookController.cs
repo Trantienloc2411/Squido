@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedViewModal.ViewModels;
 using WebApplication1.Services.Interfaces;
@@ -5,10 +6,11 @@ using WebApplication1.Services.Interfaces;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-public class BookController( IBookService bookService) : ControllerBase
+public class BookController(IBookService bookService) : ControllerBase
 {
 
     [HttpGet("api/Book")]
+    [Authorize]
     public async Task<IActionResult> GetBooks(string? keyword, [FromQuery] int? page = null, [FromQuery] int pageSize = 10)
     {
         try

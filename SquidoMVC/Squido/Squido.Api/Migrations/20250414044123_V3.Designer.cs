@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Squido.Models;
+using WebApplication1.Models;
 
 #nullable disable
 
-namespace Squido.Migrations
+namespace WebApplication1.Migrations
 {
     [DbContext(typeof(SquidoDbContext))]
     [Migration("20250414044123_V3")]

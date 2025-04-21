@@ -1,28 +1,29 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebApplication1.Models.enums;
 
-namespace Squido.Models.Entities;
+namespace WebApplication1.Models.Entities;
 
 public class User
 {
         [Key]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         
-        public string Username { get; set; }
+        public string? Username { get; set; }
         
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
         
-        public string LastName { get; set; } 
+        public string? LastName { get; set; } 
         
-        public int Gender { get; set; }
+        public GenderEnum Gender { get; set; }
         
         public string Email { get; set; }
         
         public string Password { get; set; }
         
-        public string AvatarImg { get; set; }
+        public string? AvatarImg { get; set; }
         
-        public string Address { get; set; }
+        public string? Address { get; set; }
         
         public int RoleId { get; set; }
         

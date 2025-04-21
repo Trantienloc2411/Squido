@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Squido.Models;
+using Squido.Services.Implementations;
+using Squido.Services.Interfaces;
 
 namespace Squido;
 
@@ -14,6 +16,9 @@ public class Program
             client.BaseAddress = new Uri(builder.Configuration["Squido:Url"]);
         });
         
+        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        builder.Services.AddScoped<ICookieService, CookieService>();
+
         
         builder.Services.AddControllersWithViews();
 

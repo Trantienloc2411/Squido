@@ -1,5 +1,4 @@
-﻿using Squido.DAOs.Interfaces;
-using Squido.Models.Entities;
+﻿using WebApplication1.Models.Entities;
 
 namespace WebApplication1.DAOs.Interfaces;
 
@@ -13,5 +12,7 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<Rating> RatingRepository { get; }
     IGenericRepository<Role> RoleRepository { get; }
     IGenericRepository<ImageBook> ImageBookRepository { get; }
+    IGenericRepository<Author> AuthorRepository { get; }
+    IGenericRepository<RefreshToken> RefreshTokenRepository {get;}
     void Save();
 }

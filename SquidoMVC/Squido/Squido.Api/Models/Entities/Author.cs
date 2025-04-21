@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Squido.Models.Entities;
 
 namespace WebApplication1.Models.Entities;
 

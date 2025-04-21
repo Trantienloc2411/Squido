@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Squido.Models;
+using WebApplication1.Models;
 
 #nullable disable
 
-namespace Squido.Migrations
+namespace WebApplication1.Migrations
 {
     [DbContext(typeof(SquidoDbContext))]
     partial class SquidoDbContextModelSnapshot : ModelSnapshot
@@ -22,7 +22,7 @@ namespace Squido.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Author", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Author", b =>
                 {
                     b.Property<Guid>("AuthorId")
                         .ValueGeneratedOnAdd()
@@ -43,7 +43,7 @@ namespace Squido.Migrations
                     b.ToTable("Authors", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Book", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Book", b =>
                 {
                     b.Property<string>("BookId")
                         .ValueGeneratedOnAdd()
@@ -91,7 +91,7 @@ namespace Squido.Migrations
                     b.ToTable("Books", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Category", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -118,7 +118,7 @@ namespace Squido.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.ImageBook", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.ImageBook", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,7 +142,7 @@ namespace Squido.Migrations
                     b.ToTable("ImageBook", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Order", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Order", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -150,9 +150,8 @@ namespace Squido.Migrations
                     b.Property<DateTime?>("CompleteTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DeliveryDate")
                         .HasColumnType("datetime2");
@@ -177,11 +176,11 @@ namespace Squido.Migrations
                     b.ToTable("Orders", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.OrderItem", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.OrderItem", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BookId")
                         .IsRequired()
@@ -207,7 +206,7 @@ namespace Squido.Migrations
                     b.ToTable("OrderItems", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Rating", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Rating", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -216,13 +215,11 @@ namespace Squido.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("OrderItemId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("OrderItemId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("RatingValue")
                         .HasColumnType("int");
@@ -236,7 +233,30 @@ namespace Squido.Migrations
                     b.ToTable("Ratings", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Role", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RefreshTokens", (string)null);
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Entities.Role", b =>
                 {
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
@@ -244,25 +264,24 @@ namespace Squido.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
 
-                    b.Property<int>("RoleName")
-                        .HasColumnType("int");
+                    b.Property<string>("RoleName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.User", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AvatarImg")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -270,7 +289,6 @@ namespace Squido.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Gender")
@@ -280,7 +298,6 @@ namespace Squido.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
@@ -291,7 +308,6 @@ namespace Squido.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -301,15 +317,15 @@ namespace Squido.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Book", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Book", b =>
                 {
-                    b.HasOne("Squido.Mvc.Models.Entities.Author", "Author")
+                    b.HasOne("WebApplication1.Models.Entities.Author", "Author")
                         .WithMany("Books")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Squido.Mvc.Models.Entities.Category", "Category")
+                    b.HasOne("WebApplication1.Models.Entities.Category", "Category")
                         .WithMany("Books")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -320,9 +336,9 @@ namespace Squido.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.ImageBook", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.ImageBook", b =>
                 {
-                    b.HasOne("Squido.Mvc.Models.Entities.Book", "Book")
+                    b.HasOne("WebApplication1.Models.Entities.Book", "Book")
                         .WithMany("ImageBooks")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -331,9 +347,9 @@ namespace Squido.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Order", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Order", b =>
                 {
-                    b.HasOne("Squido.Mvc.Models.Entities.User", "Customer")
+                    b.HasOne("WebApplication1.Models.Entities.User", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -342,15 +358,15 @@ namespace Squido.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.OrderItem", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.OrderItem", b =>
                 {
-                    b.HasOne("Squido.Mvc.Models.Entities.Book", "Book")
+                    b.HasOne("WebApplication1.Models.Entities.Book", "Book")
                         .WithMany("OrderItems")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Squido.Mvc.Models.Entities.Order", "Order")
+                    b.HasOne("WebApplication1.Models.Entities.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -361,15 +377,15 @@ namespace Squido.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Rating", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Rating", b =>
                 {
-                    b.HasOne("Squido.Mvc.Models.Entities.User", "Customer")
+                    b.HasOne("WebApplication1.Models.Entities.User", "Customer")
                         .WithMany("Ratings")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Squido.Mvc.Models.Entities.OrderItem", "OrderItem")
+                    b.HasOne("WebApplication1.Models.Entities.OrderItem", "OrderItem")
                         .WithMany("Ratings")
                         .HasForeignKey("OrderItemId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -380,9 +396,9 @@ namespace Squido.Migrations
                     b.Navigation("OrderItem");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.User", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.User", b =>
                 {
-                    b.HasOne("Squido.Mvc.Models.Entities.Role", "Role")
+                    b.HasOne("WebApplication1.Models.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -391,39 +407,39 @@ namespace Squido.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Author", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Author", b =>
                 {
                     b.Navigation("Books");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Book", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Book", b =>
                 {
                     b.Navigation("ImageBooks");
 
                     b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Category", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Category", b =>
                 {
                     b.Navigation("Books");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Order", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Order", b =>
                 {
                     b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.OrderItem", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.OrderItem", b =>
                 {
                     b.Navigation("Ratings");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.Role", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.Role", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Squido.Mvc.Models.Entities.User", b =>
+            modelBuilder.Entity("WebApplication1.Models.Entities.User", b =>
                 {
                     b.Navigation("Orders");
 

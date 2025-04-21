@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Squido.Models;
+using WebApplication1.Models;
 
 #nullable disable
 
-namespace Squido.Migrations
+namespace WebApplication1.Migrations
 {
     [DbContext(typeof(SquidoDbContext))]
     [Migration("20250413100850_BookV1")]
-    partial class BookV1
+    partial class BookV1 : Migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
