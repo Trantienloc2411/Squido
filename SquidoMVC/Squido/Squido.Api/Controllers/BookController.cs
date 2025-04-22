@@ -10,7 +10,6 @@ public class BookController(IBookService bookService) : ControllerBase
 {
 
     [HttpGet("api/Book")]
-    [Authorize]
     public async Task<IActionResult> GetBooks(string? keyword, [FromQuery] int? page = null, [FromQuery] int pageSize = 10)
     {
         try

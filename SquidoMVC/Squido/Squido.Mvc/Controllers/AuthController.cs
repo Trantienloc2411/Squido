@@ -5,6 +5,7 @@ namespace Squido.Controllers
 {
     public class AuthController(IHttpClientFactory httpClientFactory) : Controller
     {
+        public Task<IActionResult> Index() => Task.FromResult<IActionResult>(View("Views/Authorization/Login.cshtml"));
         public async Task<IActionResult> Login()
         {
             try

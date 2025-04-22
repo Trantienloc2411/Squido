@@ -38,4 +38,8 @@
       <ProjectReference Include="..\Squido.Api\Squido.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Shared\Components\LoginStatus\Default.cshtml" />
+    </ItemGroup>
+
 </Project>

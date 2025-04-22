@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor HttpContextAccessor;
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -78,9 +81,8 @@
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count">$56.00</span>
                     </a>
-                    <a href="login.html" class="btn btn-outline-primary" id="loginBtn"
-                    >Login</a
-                    >
+                    <a asp-action="Index" asp-controller="Auth" class="btn btn-outline-primary" id="loginBtn"
+                    >Login</a>
                     <div class="dropdown d-none" id="userDropdown">
                         <button
                             class="btn btn-outline-primary dropdown-toggle"
