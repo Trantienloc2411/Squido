@@ -5,7 +5,7 @@ using HomeViewModal = SharedViewModal.ViewModels.HomeViewModal;
 
 namespace Squido.Controllers;
 
-public class HomeController(IHttpClientFactory httpClientFactory) : Controller
+public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controller
 {
     public List<BookViewModel>? BooksList { get; set; }
     public List<CategoryViewModel>? CategoriesList { get; set; }
@@ -34,7 +34,8 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
                 Categories = CategoriesList,
                 Books = BooksList
             };
-
+            var token = HttpContext.Session.GetString("AccessToken");
+            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
             return View(viewModal);
         }
         catch (Exception e)
@@ -72,7 +73,8 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
 
                 pagingationData.Categories = categories;
             }
-
+            var token = HttpContext.Session.GetString("AccessToken");
+            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
             ViewBag.Keyword = keyword;
             return View("Store", pagingationData);
         }
@@ -86,11 +88,15 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
 
     public IActionResult Contact()
     {
+        var token = HttpContext.Session.GetString("AccessToken");
+        ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
         return View();
     }
 
     public IActionResult AboutUs()
     {
+        var token = HttpContext.Session.GetString("AccessToken");
+        ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
         return View();
     }
 
@@ -123,6 +129,8 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
                 // Assign categories to the pagination object
                 pagingationData.Categories = categories;
             }
+            var token = HttpContext.Session.GetString("AccessToken");
+            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
 
             return View(pagingationData);
         }
@@ -163,6 +171,8 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
                 book.Categories = result;
             }
             ViewBag.Categories = categoryIds;
+            var token = HttpContext.Session.GetString("AccessToken");
+            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
             return View("Store", book);
         }
         catch (Exception e)

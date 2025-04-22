@@ -27,6 +27,11 @@
     />
     </head>
 <body>
+
+@{
+    var accessToken = HttpContextAccessor?.HttpContext?.Session.GetString("AccessToken");
+    var isLoggedIn = !string.IsNullOrEmpty(accessToken);
+}
 <header>
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
@@ -44,7 +49,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="nav-link active" asp-controller="HomeMvc" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a
@@ -60,13 +65,13 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-action="Store" asp-controller="Home">Store</a>
+                        <a class="nav-link" asp-action="Store" asp-controller="HomeMvc">Store</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Contact" >Contact</a>
+                        <a class="nav-link" asp-controller="HomeMvc" asp-action="Contact" >Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="AboutUs">About Us</a>
+                        <a class="nav-link" asp-controller="HomeMvc" asp-action="AboutUs">About Us</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
@@ -78,31 +83,24 @@
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count">$56.00</span>
                     </a>
-                    <a href="login.html" class="btn btn-outline-primary" id="loginBtn"
-                    >Login</a
-                    >
-                    <div class="dropdown d-none" id="userDropdown">
-                        <button
-                            class="btn btn-outline-primary dropdown-toggle"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                        >
-                            <i class="fas fa-user-circle me-1"></i>
-                            <span id="username">User</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="profile.html">Profile</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="orders.html">My Orders</a>
-                            </li>
-                            <li><hr class="dropdown-divider" /></li>
-                            <li>
-                                <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
-                            </li>
-                        </ul>
-                    </div>
+                    @if (ViewBag.IsLoggedIn == true)
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                My Account
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Info">Info</a></li>
+                                <li><a class="dropdown-item" asp-controller="Cart" asp-action="Index">Cart</a></li>
+                                <li><a class="dropdown-item" asp-controller="Order" asp-action="Index">Order</a></li>
+                                <li><a class="dropdown-item" data-bs-toggle="modal" style="cursor: pointer;" data-bs-target="#logoutModal">Logout</a></li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" asp-controller="AuthMvc" class="btn btn-outline-primary">Login</a>
+                    }
                 </div>
             </div>
         </div>
@@ -127,10 +125,10 @@
             <div class="col-lg-2">
                 <h5 class="footer-title">Quick Links</h5>
                 <ul class="footer-links list-unstyled">
-                    <li><a  class="text-decoration-none"  asp-controller="Home" asp-action="Index" >Home</a></li>
+                    <li><a  class="text-decoration-none"  asp-controller="HomeMvc" asp-action="Index" >Home</a></li>
                     <li><a  class="text-decoration-none" href="store.html">Store</a></li>
-                    <li><a  class="text-decoration-none" asp-controller="Home" asp-action="AboutUs">About Us</a></li>
-                    <li><a  class="text-decoration-none" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a  class="text-decoration-none" asp-controller="HomeMvc" asp-action="AboutUs">About Us</a></li>
+                    <li><a  class="text-decoration-none" asp-controller="HomeMvc" asp-action="Contact">Contact</a></li>
                 </ul>
             </div>
             <div class="col-lg-2">
@@ -175,6 +173,26 @@
         </div>
     </div>
 </footer>
+
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to logout?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-controller="AuthMvc" asp-action="Logout" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
@@ -209,7 +227,9 @@
             },
         },
     });
+    
 </script>
 @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

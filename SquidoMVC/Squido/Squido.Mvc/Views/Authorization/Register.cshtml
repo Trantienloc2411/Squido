@@ -1,0 +1,191 @@
+@model SharedViewModal.RequestViewModal.RegisterRequestVm
+@{
+    ViewData["Title"] = "Register";
+}
+
+<section class="auth-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="auth-card">
+                    <div class="auth-header text-center mb-4">
+                        <h2 class="auth-title">Create an Account</h2>
+                        <p class="auth-subtitle">Join <span class="text-logo">Squido</span> and discover your next favorite book</p>
+                    </div>
+
+                    <form asp-action="Register" asp-controller="AuthMvc" id="registerForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label">First Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input asp-for="FirstName" class="form-control" placeholder="Enter first name" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label">Last Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input asp-for="LastName" class="form-control" placeholder="Enter last name" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input asp-for="Username" class="form-control" placeholder="Enter your username" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" type="email" placeholder="Enter your email" required />
+                            </div>
+                            <div class="form-text">We'll never share your email with anyone else.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input asp-for="Password" class="form-control" type="password" id="password" placeholder="Enter password" required />
+                                <button class="btn btn-outline-secondary toggle-password" type="button">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength mt-2">
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small class="password-feedback text-muted">Password must be at least 8 characters long</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsAgree" required />
+                                <label class="form-check-label" for="termsAgree">
+                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-4">Create Account</button>
+
+                        <div class="auth-divider mb-4">
+                            <span>Or Register With</span>
+                        </div>
+
+                        <div class="social-auth mb-4">
+                            <button type="button" class="btn btn-outline-primary me-2"><i class="fab fa-google"></i> Google</button>
+                            <button type="button" class="btn btn-outline-primary me-2"><i class="fab fa-facebook-f"></i> Facebook</button>
+                            <button type="button" class="btn btn-outline-primary"><i class="fab fa-twitter"></i> Twitter</button>
+                        </div>
+
+                        <div class="auth-footer text-center">
+                            <p class="mb-0">Already have an account? <a href="/AuthMvc/Login" class="text-primary">Login</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (TempData["RegisterError"] != null)
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast align-items-center text-bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true" id="registerToast">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["RegisterError"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toastEl = document.getElementById("registerToast");
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                toast.show();
+            }
+        });
+
+        // Password Strength
+        const passwordInput = document.getElementById("password");
+        const progressBar = document.querySelector(".progress-bar");
+        const feedback = document.querySelector(".password-feedback");
+
+        passwordInput.addEventListener("input", function () {
+            const val = passwordInput.value;
+            let strength = 0;
+
+            if (val.length >= 8) strength++;
+            if (/[A-Z]/.test(val)) strength++;
+            if (/[0-9]/.test(val)) strength++;
+            if (/[\W_]/.test(val)) strength++;
+
+            let width = "0%", color = "bg-danger", message = "Too weak";
+            switch (strength) {
+                case 1: width = "25%"; message = "Very weak"; break;
+                case 2: width = "50%"; color = "bg-warning"; message = "Weak"; break;
+                case 3: width = "75%"; color = "bg-info"; message = "Moderate"; break;
+                case 4: width = "100%"; color = "bg-success"; message = "Strong"; break;
+            }
+
+            progressBar.className = `progress-bar ${color}`;
+            progressBar.style.width = width;
+            feedback.textContent = message;
+        });
+
+        // Toggle Password Visibility
+        document.querySelectorAll(".toggle-password").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const input = this.previousElementSibling;
+                const isPassword = input.getAttribute("type") === "password";
+                input.setAttribute("type", isPassword ? "text" : "password");
+                this.querySelector("i").classList.toggle("fa-eye");
+                this.querySelector("i").classList.toggle("fa-eye-slash");
+            });
+        });
+
+        // Confirm Password Match
+        const confirmPassword = document.getElementById("confirmPassword");
+        const confirmGroup = confirmPassword.closest(".mb-4");
+        let mismatchMsg = document.createElement("small");
+        mismatchMsg.classList.add("text-danger", "d-none");
+        mismatchMsg.textContent = "Passwords do not match";
+        confirmGroup.appendChild(mismatchMsg);
+
+        function validatePasswordMatch() {
+            if (passwordInput.value && confirmPassword.value && passwordInput.value !== confirmPassword.value) {
+                mismatchMsg.classList.remove("d-none");
+            } else {
+                mismatchMsg.classList.add("d-none");
+            }
+        }
+
+        passwordInput.addEventListener("input", validatePasswordMatch);
+        confirmPassword.addEventListener("input", validatePasswordMatch);
+    </script>
+}

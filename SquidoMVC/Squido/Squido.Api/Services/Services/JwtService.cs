@@ -8,8 +8,16 @@ using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegiste
 
 namespace WebApplication1.Services.Services;
 
-public class JwtService(IUnitOfWork uoW, IConfiguration config)
+public class JwtService
 {
+    private readonly IUnitOfWork uoW;
+    private readonly IConfiguration config;
+
+    public JwtService(IUnitOfWork uoW, IConfiguration config) 
+    {
+        this.uoW = uoW;
+        this.config = config;
+    }
 
     public string GenerateToken(string userId, string username, int RoleId)
     {

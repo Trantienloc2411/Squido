@@ -30,12 +30,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Views\Authorization\" />
+      <ProjectReference Include="..\SharedViewModal\SharedViewModal.csproj" />
+      <ProjectReference Include="..\Squido.Api\Squido.Api.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SharedViewModal\SharedViewModal.csproj" />
-      <ProjectReference Include="..\Squido.Api\Squido.Api.csproj" />
+      <_ContentIncludedByDefault Remove="Views\Shared\Components\LoginStatus\Default.cshtml" />
     </ItemGroup>
 
 </Project>

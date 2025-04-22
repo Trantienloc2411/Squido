@@ -1,5 +1,110 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Login";
+}
+@using SharedViewModal.RequestViewModal;
+@model LoginRequestVm;
+
+<section class="auth-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="auth-card">
+                    <div class="auth-header text-center mb-4">
+                        <h2 class="auth-title">Login to Your Account</h2>
+                        <p class="auth-subtitle">Welcome back! Please log in to your account</p>
+                    </div>
+
+                    <form method="post" asp-controller="AuthMvc" asp-action="Login" id="loginForm">
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" placeholder="Enter your email" required="required" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input asp-for="Password" class="form-control" type="password"
+                                       placeholder="Enter your password" required="required" />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-4">Login</button>
+
+                        <div class="auth-footer text-center">
+                            <p class="mb-0">Don't have an account?
+                                <a asp-action="RegisterPage" asp-controller="AuthMvc" class="text-primary">Register</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ✅ Toast Container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1055">
+    @if (TempData["LoginError"] != null)
+    {
+        <div class="toast show align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["LoginError"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    @if (TempData["RegisterSuccess"] != null)
+    {
+        <div class="toast align-items-center text-bg-success border-0"
+             role="alert" aria-live="assertive" aria-atomic="true"
+             id="registerSuccessToast">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["RegisterSuccess"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        console.log("Login page loaded!");
+
+        // Auto-hide for LoginError toast
+        setTimeout(() => {
+            const toast = document.querySelector('.toast.text-bg-danger');
+            if (toast) {
+                const bsToast = bootstrap.Toast.getOrCreateInstance(toast);
+                bsToast.hide();
+            }
+        }, 4000);
+    </script>
+
+    @if (TempData["RegisterSuccess"] != null)
+    {
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const toastEl = document.getElementById('registerSuccessToast');
+                if (toastEl) {
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.show();
+
+                    setTimeout(() => toast.hide(), 4000);
+                }
+            });
+        </script>
+    }
 }

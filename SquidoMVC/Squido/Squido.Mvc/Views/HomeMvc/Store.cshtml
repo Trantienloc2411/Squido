@@ -30,7 +30,7 @@
         <div class="row">
             <!-- Sidebar Filters -->
             <div class="col-lg-3">
-                <form method="get" asp-controller="Home" asp-action="Filter">
+                <form method="get" asp-controller="HomeMvc" asp-action="Filter">
                     <div class="filter-card">
                         <h5 class="filter-title">Categories</h5>
                         <div class="filter-body">
@@ -108,7 +108,7 @@
             <!-- Product Grid -->
             <div class="col-lg-9">
                 <div class="store-header d-flex justify-content-between align-items-center mb-4">
-                    <form method="get" asp-controller="Home" asp-action="Search">
+                    <form method="get" asp-controller="HomeMvc" asp-action="Search">
                         <div class="search-box mt-3">
                             <div class="input-group shadow rounded-pill overflow-hidden">
                                 <input
@@ -141,7 +141,7 @@
                     {
                         <div class="col-lg-4 col-md-6 mb-4">
                             <div class="book-card">
-                                <a class="text-decoration-none text-black" asp-controller="Book" asp-action="Details"
+                                <a class="text-decoration-none text-black" asp-controller="BookMvc" asp-action="Details"
                                    asp-route-id="@item.BookId">
                                     <div class="book-image">
                                         <img src="~/images/1_.jpg" alt="@item.Title" class="img-fluid">
@@ -178,7 +178,7 @@
                                                             asp-page="/store"
                                                             asp-route-currentpage="@i"
                                                             
-                                                            >@i</a></li>
+                                                         >@i</a></li>
                         }
                         <li class="page-item">
                             <a class="page-link" href="#">Next</a>
@@ -189,3 +189,4 @@
         </div>
     </div>
 </section>
+

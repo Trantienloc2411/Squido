@@ -11,16 +11,21 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddHttpClient("Squido", client =>
-        {
-            client.BaseAddress = new Uri(builder.Configuration["Squido:Url"]);
-        });
-        
+        builder.Services.AddHttpClient("Squido",
+            client => { client.BaseAddress = new Uri(builder.Configuration["Squido:Url"]); });
+
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddScoped<ICookieService, CookieService>();
+        builder.Services.AddDistributedMemoryCache(); //In-memory session store
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddSession(option =>
+        {
+            option.IdleTimeout = TimeSpan.FromMinutes(60);
+            option.Cookie.IsEssential = true;
+            option.Cookie.HttpOnly = true;
+        });
 
-        
-        builder.Services.AddControllersWithViews();
+    builder.Services.AddControllersWithViews();
 
         var app = builder.Build();
 
@@ -33,14 +38,17 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseSession();
         app.UseRouting();
+
+        
 
         app.UseAuthorization();
 
         app.MapStaticAssets();
         app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=HomeMvc}/{action=Index}/{id?}")
             .WithStaticAssets();
 
         app.Run();

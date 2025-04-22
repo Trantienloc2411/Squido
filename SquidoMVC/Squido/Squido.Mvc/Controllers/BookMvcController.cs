@@ -6,7 +6,7 @@ using Squido.Models.ViewModals;
 
 namespace Squido.Controllers;
 
-public class BookController(IHttpClientFactory clientFactory) : Controller
+public class BookMvcController(IHttpClientFactory clientFactory) : Controller
 {
     
 
@@ -22,6 +22,8 @@ public class BookController(IHttpClientFactory clientFactory) : Controller
                 var content  = await responseBook.Content.ReadAsStringAsync();
                 var book = JsonSerializer.Deserialize<ViewBookDetailViewModel>(content,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var token = HttpContext.Session.GetString("AccessToken");
+                ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
                 return View(book);
             }
             return View();

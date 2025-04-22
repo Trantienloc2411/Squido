@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedViewModal.ViewModels;
@@ -6,11 +7,10 @@ using WebApplication1.Services.Interfaces;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-public class BookController(IBookService bookService) : ControllerBase
+public class BookController(IBookService bookService, IMapper mapper) : ControllerBase
 {
 
     [HttpGet("api/Book")]
-    [Authorize]
     public async Task<IActionResult> GetBooks(string? keyword, [FromQuery] int? page = null, [FromQuery] int pageSize = 10)
     {
         try
@@ -59,33 +59,25 @@ public class BookController(IBookService bookService) : ControllerBase
         try
         {
             var book = await bookService.GetBookById(bookId);
+            if (book == null)
+            {
+                return NotFound();
+            }
             var bookRelated = await bookService.GetBookByAuthorId(book.AuthorId.ToString(), bookId);
-
+            var listBookRelated = bookRelated.ToList();
+            var bookViewModel = new BookViewModel();
+            var categoryViewModel = new CategoryViewModel();
+            var bookResult = mapper.Map(book, bookViewModel);
+            var categoryResult = mapper.Map(book.Category, categoryViewModel);
             var details = new ViewBookDetailViewModel
             {
-                Book =
-                {
-                    AuthorName = book.Author.FullName,
-                    Title = book.Title,
-                    BookId = book.BookId,
-                    BuyCount = book.BuyCount,
-                    CategoryName = book.Category.Name,
-                    CreatedDate = book.CreatedDate,
-                    Price = book.Price,
-                    Quantity = book.Quantity,
-                    UpdatedDate = (DateTime)book.UpdatedDate,
-                },
-                Category =
-                {
-                    CategoryId = book.CategoryId,
-                    Description = book.Description,
-                    Name = book.Category.Name
-                },
+                Book = bookResult,
+                Category = categoryResult,
                 Bio = book.Author.Bio,
                 ImageUrl = "",
                 RatingValueAverage = 4.5,
                 BookDescription = book.Description,
-                BookRelated = (List<BookViewModel>)bookRelated,
+                BookRelated = listBookRelated,
             };
 
             return Ok(details);
@@ -148,6 +140,6 @@ public class BookController(IBookService bookService) : ControllerBase
             throw;
         }
     }
-
+    
 
 }
