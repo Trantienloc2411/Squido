@@ -42,7 +42,8 @@ namespace WebApplication1.Models
                 .WithMany(c => c.Books)
                 .HasForeignKey(b => b.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
+
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
@@ -83,7 +84,7 @@ namespace WebApplication1.Models
                 .WithOne(b => b.Author)
                 .HasForeignKey(a => a.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
-        
+
             modelBuilder.Entity<Book>()
                 .Property(b => b.Price)
                 .HasPrecision(18, 2);
@@ -93,11 +94,8 @@ namespace WebApplication1.Models
             modelBuilder.Entity<OrderItem>()
                 .Property(o => o.UnitPrice)
                 .HasPrecision(18, 2);
-        
-        
 
+            
         }
-    
-
     }
 }

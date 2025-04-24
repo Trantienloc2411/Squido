@@ -1,0 +1,4 @@
+﻿@using SharedViewModal.ViewModels;
+@model CartSummaryViewModel
+
+<span class="cart-count">@Model.ItemCount @(Model.ItemCount <= 1 ? "Book" : "Books")</span>

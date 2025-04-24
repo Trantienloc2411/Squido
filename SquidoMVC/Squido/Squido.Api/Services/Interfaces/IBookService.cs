@@ -10,5 +10,7 @@ namespace WebApplication1.Services.Interfaces
         Task<Book> GetBookById(string id);
         Task<ICollection<BookViewModel>> GetBookByAuthorId(string authorId, string? currentBook);
         Task<ICollection<BookViewModel>> GetBooksByCategoryId(List<int> categoryIds);
+        
+        
     }
 }

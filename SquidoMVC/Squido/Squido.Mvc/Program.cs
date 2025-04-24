@@ -18,6 +18,7 @@ public class Program
         builder.Services.AddScoped<ICookieService, CookieService>();
         builder.Services.AddDistributedMemoryCache(); //In-memory session store
         builder.Services.AddHttpContextAccessor();
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddSession(option =>
         {
             option.IdleTimeout = TimeSpan.FromMinutes(60);
