@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SharedViewModal.ViewModels
+@using System.Globalization
 @model SharedViewModal.ViewModels.PaginationViewModel<SharedViewModal.ViewModels.BookViewModel>?
 @{
     ViewData["Title"] = "Store";
@@ -7,7 +9,7 @@
     <!-- Background Image -->
     <div class="banner-bg position-absolute end-0 top-0 z-0 d-none d-lg-block">
         <img src="~/images/quentin-schulz-HIhcvRm_yQ8-unsplash.jpg" alt="Book Store Banner" class="img-fluid"
-             style=" opacity: 0.6;">
+            style=" opacity: 0.6;">
     </div>
 
 
@@ -23,7 +25,6 @@
         </div>
     </div>
 </section>
-
 <!-- Store Content -->
 <section class="store-content py-5">
     <div class="container">
@@ -38,7 +39,7 @@
                             {
                                 <div class="form-check">
                                     <input class="form-check-input category-checkbox" type="checkbox" name="categories"
-                                           value="@item.CategoryId" id="cat-@item.CategoryId">
+                                        value="@item.CategoryId" id="cat-@item.CategoryId">
                                     <label class="form-check-label" for="@item.CategoryId">
                                         @item.Name - @item.CategoryId
                                     </label>
@@ -60,6 +61,8 @@
                             </div>
                         </div>
                     </div>
+
+
                     @* <div class="filter-card mt-4"> *@
                     @*     <h5 class="filter-title">Rating</h5> *@
                     @*     <div class="filter-body"> *@
@@ -96,14 +99,14 @@
                     @*     </div> *@
                     @* </div> *@
 
-                    
+
 
                     <button class="btn btn-primary w-100 mt-4">Apply Filters</button>
                 </form>
 
 
             </div>
-            
+
 
             <!-- Product Grid -->
             <div class="col-lg-9">
@@ -111,13 +114,8 @@
                     <form method="get" asp-controller="HomeMvc" asp-action="Search">
                         <div class="search-box mt-3">
                             <div class="input-group shadow rounded-pill overflow-hidden">
-                                <input
-                                    type="text"
-                                    name="keyword"
-                                    value="@ViewBag.Keyword"
-                                    class="form-control border-0 ps-4 py-3"
-                                    placeholder="Search Here"
-                                />
+                                <input type="text" name="keyword" value="@ViewBag.Keyword"
+                                    class="form-control border-0 ps-4 py-3" placeholder="Search Here" />
                                 <button class="btn btn-primary px-3" type="submit">
                                     <i class="fas fa-search me-2"></i> Find Book
                                 </button>
@@ -141,20 +139,19 @@
                     {
                         <div class="col-lg-4 col-md-6 mb-4">
                             <div class="book-card">
+
                                 <a class="text-decoration-none text-black" asp-controller="BookMvc" asp-action="Details"
-                                   asp-route-id="@item.BookId">
+                                    asp-route-id="@item.BookId">
                                     <div class="book-image">
                                         <img src="~/images/1_.jpg" alt="@item.Title" class="img-fluid">
                                     </div>
                                     <div class="book-info">
                                         <h5 class="book-title">@item.Title</h5>
                                         <p class="book-author">By <span class="fw-bold ">@item.AuthorName </span> -
-                                            <span class="text-muted fst-italic">@item.CategoryName</span></p>
+                                            <span class="text-muted fst-italic">@item.CategoryName</span>
+                                        </p>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="book-price">$@item.Price</span>
-                                            <button class="btn btn-sm btn-primary add-to-cart" data-id="3">
-                                                <i class="fas fa-shopping-cart me-1"></i> Add
-                                            </button>
+                                            <span class="book-price">@item.Price.ToString("C2", new CultureInfo("en-US"))</span>
                                         </div>
                                     </div>
                                 </a>
@@ -165,28 +162,22 @@
                     <!-- More products would be added here -->
                 </div>
 
-                <!-- Pagination -->
-                <nav aria-label="Page navigation" class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                        </li>
-                        @for (var i = 1; i <= Model.PageCount; i++)
-                        {
-                            <li class="page-item active"><a class="page-link" 
-                                                            asp-route-keyword="@ViewBag.Keyword" 
-                                                            asp-page="/store"
-                                                            asp-route-currentpage="@i"
-                                                            
-                                                         >@i</a></li>
-                        }
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
-                    </ul>
-                </nav>
+                @{
+                    var isFilter = (ViewBag.CurrentAction as string) == "Filter";
+                    var paginationModel = new PaginationHelperModel
+                    {
+                        CurrentPage = Model.CurrentPage,
+                        PageCount = Model.PageCount,
+                        Keyword = ViewBag.Keyword as string,
+                        Categories = ViewBag.Categories as List<int> ?? new List<int>(), // Use preprocessed categories
+                        Action = ViewBag.CurrentAction ?? "Store",
+                        Controller = "HomeMvc"
+                    };
+                }
+
+                @await Html.PartialAsync("_Pagination", paginationModel)
+
             </div>
         </div>
     </div>
 </section>
-

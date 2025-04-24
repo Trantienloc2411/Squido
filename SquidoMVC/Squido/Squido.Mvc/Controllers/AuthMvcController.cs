@@ -9,18 +9,26 @@ using SharedViewModal.ViewModels;
 
 namespace Squido.Controllers
 {
-    public class AuthMvcController(IHttpClientFactory httpClientFactory) : Controller
+    public class AuthMvcController(IHttpClientFactory httpClientFactory) : BaseController
     {
-        public Task<IActionResult> Index()
+        public IActionResult Index()
         {
             var token = HttpContext.Session.GetString("AccessToken");
+
+            // ✅ Only set error if not already set by another controller
             if (!string.IsNullOrEmpty(token))
             {
-                return Task.FromResult<IActionResult>(View("Views/Index.cshtml"));
+                if (TempData["ErrorLogin"] == null)
+                {
+                    TempData["ErrorLogin"] = "For best experience please login first";
+                }
+                return View("Views/Index.cshtml");
             }
-            return Task.FromResult<IActionResult>(View("Views/Authorization/Login.cshtml"));
+
+            return View("Views/Authorization/Login.cshtml");
         }
-        
+
+
         public Task<IActionResult> RegisterPage()
         {
             var token = HttpContext.Session.GetString("AccessToken");
@@ -45,7 +53,7 @@ namespace Squido.Controllers
                 var responseBody = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    
+
                     var authResponse = JsonSerializer.Deserialize<AuthResponse>(responseBody, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
@@ -57,11 +65,12 @@ namespace Squido.Controllers
 
                     return RedirectToAction("Index", "HomeMvc");
                 }
-                else {
+                else
+                {
                     TempData["LoginError"] = response is not null ? responseBody : "Something went wrong";
                     return View("Views/Authorization/Login.cshtml");
                 }
-                
+
             }
             catch (Exception e)
             {
@@ -78,6 +87,7 @@ namespace Squido.Controllers
             HttpContext.Session.Remove("RefreshToken");
             HttpContext.Session.Remove("Id");
             HttpContext.Session.Remove("Username");
+            HttpContext.Session.Remove("Cart");
             return Task.FromResult<IActionResult>(RedirectToAction("Index", "HomeMvc"));
         }
 
@@ -102,7 +112,7 @@ namespace Squido.Controllers
                     TempData["RegisterError"] = responseBody is not null ? responseBody : "Something went wrong";
                     return RedirectToAction("RegisterPage", "AuthMvc");
                 }
-                
+
             }
             catch (Exception e)
             {

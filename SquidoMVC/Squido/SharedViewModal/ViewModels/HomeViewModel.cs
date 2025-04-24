@@ -2,7 +2,7 @@
 
 namespace SharedViewModal.ViewModels;
 
-public class HomeViewModal
+public class HomeViewModel
 {
     public ICollection<BookViewModel>? Books { get; set; }
     public List<CategoryViewModel>? Categories { get; set; }

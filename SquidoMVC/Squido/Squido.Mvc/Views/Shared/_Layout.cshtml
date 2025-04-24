@@ -76,12 +76,15 @@
                 </ul>
                 <div class="d-flex align-items-center">
                     <a
-                        href="#"
+                        asp-action="LoadCartItem" asp-controller="CartMvc"
                         class="cart-icon me-3 btn btn-outline-secondary"
                         id="cartToggle"
                     >
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">$56.00</span>
+                        <span class="cart-count">@{
+                            @await Component.InvokeAsync("CartSummary")
+                        }
+                        </span>
                     </a>
                     @if (ViewBag.IsLoggedIn == true)
                     {
@@ -91,7 +94,7 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="Account" asp-action="Info">Info</a></li>
-                                <li><a class="dropdown-item" asp-controller="Cart" asp-action="Index">Cart</a></li>
+                                <li><a class="dropdown-item" asp-controller="CartMvc" asp-action="LoadCartItem">Cart</a></li>
                                 <li><a class="dropdown-item" asp-controller="Order" asp-action="Index">Order</a></li>
                                 <li><a class="dropdown-item" data-bs-toggle="modal" style="cursor: pointer;" data-bs-target="#logoutModal">Logout</a></li>
                             </ul>

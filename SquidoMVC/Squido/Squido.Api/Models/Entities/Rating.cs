@@ -7,7 +7,7 @@ public class Rating
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    public Guid Id { get; set; }
         
     public Guid OrderItemId { get; set; }
         

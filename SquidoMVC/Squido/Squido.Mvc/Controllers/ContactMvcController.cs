@@ -2,7 +2,7 @@
 
 namespace Squido.Controllers;
 
-public class ContactMvcController : Controller
+public class ContactMvcController : BaseController
 {
     private readonly ILogger<ContactMvcController> _logger;
 
@@ -13,8 +13,6 @@ public class ContactMvcController : Controller
 
     public IActionResult Contact()
     {
-        var token = HttpContext.Session.GetString("AccessToken");
-        ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
         return View();
     }
     

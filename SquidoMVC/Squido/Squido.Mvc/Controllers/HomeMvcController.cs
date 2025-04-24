@@ -1,11 +1,10 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SharedViewModal.ViewModels;
-using HomeViewModal = SharedViewModal.ViewModels.HomeViewModal;
 
 namespace Squido.Controllers;
 
-public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controller
+public class HomeMvcController(IHttpClientFactory httpClientFactory) : BaseController
 {
     public List<BookViewModel>? BooksList { get; set; }
     public List<CategoryViewModel>? CategoriesList { get; set; }
@@ -29,13 +28,12 @@ public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controlle
             }
 
 
-            var viewModal = new HomeViewModal
+            var viewModal = new HomeViewModel
             {
                 Categories = CategoriesList,
                 Books = BooksList
             };
-            var token = HttpContext.Session.GetString("AccessToken");
-            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
+
             return View(viewModal);
         }
         catch (Exception e)
@@ -49,6 +47,7 @@ public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controlle
 
     public async Task<ViewResult> Search(string? keyword, int currentPage = 1)
     {
+        ViewBag.CurrentAction = "Search";
         try
         {
             var client = httpClientFactory.CreateClient("Squido");
@@ -73,9 +72,8 @@ public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controlle
 
                 pagingationData.Categories = categories;
             }
-            var token = HttpContext.Session.GetString("AccessToken");
-            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
             ViewBag.Keyword = keyword;
+            ViewBag.Categories = new List<int>();
             return View("Store", pagingationData);
         }
         catch (Exception e)
@@ -88,15 +86,11 @@ public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controlle
 
     public IActionResult Contact()
     {
-        var token = HttpContext.Session.GetString("AccessToken");
-        ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
         return View();
     }
 
     public IActionResult AboutUs()
     {
-        var token = HttpContext.Session.GetString("AccessToken");
-        ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
         return View();
     }
 
@@ -104,6 +98,10 @@ public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controlle
     {
         try
         {
+            ViewBag.CurrentAction = "Store"; // Add this
+            ViewBag.Categories = new List<int>(); // Add this
+            ViewBag.Keyword = null; // Add this
+
             var client = httpClientFactory.CreateClient("Squido");
 
             var responseBook = await client.GetAsync($"/api/Book/?page={currentPage}&pageSize=9");
@@ -129,8 +127,6 @@ public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controlle
                 // Assign categories to the pagination object
                 pagingationData.Categories = categories;
             }
-            var token = HttpContext.Session.GetString("AccessToken");
-            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
 
             return View(pagingationData);
         }
@@ -141,45 +137,60 @@ public class HomeMvcController(IHttpClientFactory httpClientFactory) : Controlle
         }
     }
 
-    public async Task<IActionResult> Filter(List<int> categories, int currentPage = 1)
+    public async Task<IActionResult> Filter(List<int> categories, string keyword = null, int currentPage = 1)
     {
         try
         {
-            // Convert list to comma-separated string
+            // Set these before any potential exceptions
+            ViewBag.CurrentAction = "Filter";
+            ViewBag.Categories = categories ?? new List<int>();
+            ViewBag.Keyword = keyword;
+
             string categoryIds = categories != null && categories.Any()
                 ? string.Join(",", categories)
-                : "";
-            
-            var client = httpClientFactory.CreateClient("Squido");
-            var response = await client.GetAsync($"/api/Book/Filter/{categoryIds}?page={currentPage}&pageSize=9");
-            var responseCategory = await client.GetAsync("api/Category");
+                : string.Empty;
 
-            var book = new PaginationViewModel<BookViewModel>();
-            if (response.IsSuccessStatusCode)
+            var client = httpClientFactory.CreateClient("Squido");
+
+            // Include keyword in the filter API call if it exists
+            var endpoint = $"/api/Book/Filter/{categoryIds}?page={currentPage}&pageSize=9";
+            if (!string.IsNullOrEmpty(keyword))
             {
-                var content = await response.Content.ReadAsStringAsync();
-                book = JsonSerializer.Deserialize<PaginationViewModel<BookViewModel>>(content,
+                endpoint += $"&keyword={keyword}";
+            }
+
+            var responseBook = await client.GetAsync(endpoint);
+            var responseCategory = await client.GetAsync("/api/Category");
+            var paginationData = new PaginationViewModel<BookViewModel>();
+
+            if (responseBook.IsSuccessStatusCode)
+            {
+                var content = await responseBook.Content.ReadAsStringAsync();
+                paginationData = JsonSerializer.Deserialize<PaginationViewModel<BookViewModel>>(content,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
 
             if (responseCategory.IsSuccessStatusCode)
             {
                 var content = await responseCategory.Content.ReadAsStringAsync();
-                
-                var result = JsonSerializer.Deserialize<List<CategoryViewModel>>
-                    (content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                book.Categories = result;
+                paginationData.Categories = JsonSerializer.Deserialize<List<CategoryViewModel>>(content,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
-            ViewBag.Categories = categoryIds;
-            var token = HttpContext.Session.GetString("AccessToken");
-            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(token);
-            return View("Store", book);
+            return View("Store", paginationData);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.WriteLine(e);
+            // Use logger instead of console for production code
+            Console.WriteLine($"Filter error: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
             throw;
         }
     }
+
+
 
 }

@@ -1,0 +1,382 @@
+@using System.Globalization
+@{
+    ViewData["Title"] = "Cart";
+    decimal Subtotal = 0;
+    int TotalQuantity = 0;
+    decimal Total = 0;
+    var isDisable = Total == 0 ? "disable" : "";
+}
+@model List<SharedViewModal.ViewModels.CartItemViewModel>
+
+<section class="page-banner position-relative overflow-hidden py-5">
+    <!-- Background Image -->
+    <div class="banner-bg position-absolute end-0 top-0 z-0 d-none d-lg-block">
+        <img src="~/images/cart.jpg" alt="About Us Banner" class="img-fluid"
+             style=" opacity: 0.6; width: 100%">
+    </div>
+
+    <div class="container position-relative z-1">
+        <div class="row">
+            <div class="col-lg-7">
+                <h1 class="page-title fw-bold title-text">Shopping Cart</h1>
+                <p class="banner-text text-muted">
+    using System.Globalization;
+                    Manage your shopping cart, view your items, edit quantities and checkout.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Cart Items Table -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Cart Items (@Model.Count())</h5>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#clearCartModal">
+                            <i class="fas fa-trash-alt me-1"></i> Clear Cart
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (Model.Any())
+                        {
+                            <div class="cart-items-container">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th class="text-center">Price</th>
+                                            <th class="text-center">Quantity</th>
+                                            <th class="text-center">Subtotal</th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="@item.ImageUrl" alt="@item.Title"
+                                                             class="cart-item-image me-3"
+                                                             style="max-width: 80px; height: auto;">
+                                                        <div>
+                                                            <h6 class="mb-0">@item.Title</h6>
+                                                            <small class="text-muted">By @item.AuthorName</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">$@item.Price</td>
+                                                <td class="text-center">
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <span>@item.QuantityCart</span>
+                                                        <button class="btn btn-sm btn-link" data-bs-toggle="modal"
+                                                                data-bs-target="#updateQuantityModal"
+                                                                data-id="@item.BookId"
+                                                                data-title="@item.Title" data-author="@item.AuthorName"
+                                                                data-image="@item.ImageUrl" data-price="@item.Price"
+                                                                data-quantity="@item.QuantityCart">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">$@(item.Price * item.QuantityCart)</td>
+                                                <td class="text-center">
+                                                    <form asp-action="RemoveFromCart" asp-controller="Cart"
+                                                          method="post">
+                                                        <input type="hidden" name="bookId" value="@item.BookId"/>
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                                data-bs-toggle="modal" data-bs-target="#deleteItemModal"
+                                                                data-id="@item.BookId" data-title="@item.Title"
+                                                                data-author="@item.AuthorName"
+                                                                data-image="@item.ImageUrl">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            {
+                                                Subtotal += (decimal)(item.Price * item.QuantityCart);
+                                                TotalQuantity += item.QuantityCart;
+                                                Total += Subtotal;
+                                            }
+
+                                        }
+
+
+                                        }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <div class="empty-cart-icon mb-3">
+                                    <i class="fas fa-shopping-cart fa-4x text-muted"></i>
+                                </div>
+                                <h4 class="mb-3">Your cart is empty</h4>
+                                <p class="mb-4">Looks like you haven't added any books to your cart yet.</p>
+                                <a asp-controller="HomeMvc" asp-action="Store" class="btn btn-primary">Continue
+                                    Shopping</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (Model.Any())
+                {
+                    <!-- Cart Actions -->
+                    <div class="d-flex justify-content-between mb-4">
+                        <a asp-controller="HomeMvc" asp-action="Store" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                        </a>
+                    </div>
+
+                    <!-- Coupon Code -->
+                }
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Order Summary -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>@Subtotal.ToString("C2", new CultureInfo("en-US"))</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Quantity:</span>
+                            <span>@TotalQuantity.ToString() @(TotalQuantity <= 1 ? "Book" : "Books")</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total:</span>
+                            <span>@Total.ToString("C2", new CultureInfo("en-US"))</span>
+                        </div>
+
+                        @if (Model.Any())
+                        {
+                            <a asp-controller="CheckoutMvc" asp-action="Index" class="btn btn-primary w-100 mt-3 @isDisable ">
+                                Proceed to Checkout <i class="fas fa-arrow-right ms-2"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <!-- Shipping Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Shipping Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><i class="fas fa-truck me-2"></i> Free shipping on orders over $50</p>
+                        <p class="mb-2"><i class="fas fa-globe me-2"></i> International shipping available</p>
+                        <p class="mb-0"><i class="fas fa-clock me-2"></i> Delivery within 3-5 business days</p>
+                    </div>
+                </div>
+
+                <!-- Secure Checkout -->
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="mb-3">Secure Checkout</h6>
+                        <p class="mb-3">Your payment information is processed securely.</p>
+                        <div class="payment-icons mb-3">
+                            <i class="fab fa-cc-visa me-2"></i>
+                            <i class="fab fa-cc-mastercard me-2"></i>
+                            <i class="fab fa-cc-amex me-2"></i>
+                            <i class="fab fa-cc-paypal"></i>
+                        </div>
+                        <div class="security-badges d-flex align-items-center">
+                            <i class="fas fa-lock me-2"></i>
+                            <span>SSL Secured Checkout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+</section>
+
+<!-- Update Quantity Modal -->
+<div class="modal fade" id="updateQuantityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Quantity</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="UpdateCartItem" asp-controller="CartMvc" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="updateItemId" name="bookId" value=""/>
+                    <div class="text-center mb-4">
+                        <img id="updateItemImage" src="/placeholder.svg" alt="Book" class="img-fluid mb-3"
+                             style="max-height: 150px;">
+                        <h5 id="updateItemTitle"></h5>
+                        <p class="text-muted" id="updateItemAuthor"></p>
+                        <p class="fw-bold" id="updateItemPrice"></p>
+                    </div>
+
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <button type="button" class="btn btn-outline-secondary" id="decreaseQuantity">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" class="form-control mx-3 text-center" id="quantityInput" name="quantity"
+                               value="1" min="1" max="10" style="width: 80px;">
+                        <button type="button" class="btn btn-outline-secondary" id="increaseQuantity">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> Maximum quantity allowed is 10 per item.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Item Modal -->
+<div class="modal fade" id="deleteItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Remove Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="DeleteOneFromCart" asp-controller="CartMvc" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="deleteItemId" name="bookId" value=""/>
+                    <div class="text-center mb-4">
+                        <img id="deleteItemImage" src="/placeholder.svg" alt="Book" class="img-fluid mb-3"
+                             style="max-height: 150px;">
+                        <h5 id="deleteItemTitle"></h5>
+                        <p class="text-muted" id="deleteItemAuthor"></p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Are you sure you want to remove this item from
+                        your cart?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Clear Cart Modal -->
+<div class="modal fade" id="clearCartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Clear Cart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="ClearCart" asp-controller="CartMvc" method="post">
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-shopping-cart fa-4x text-danger mb-3"></i>
+                        <h5>Clear Your Shopping Cart</h5>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Are you sure you want to remove all items from
+                        your cart? This action cannot be undone.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Clear Cart</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle quantity update modal
+            const updateQuantityModal = document.getElementById('updateQuantityModal');
+            if (updateQuantityModal) {
+                updateQuantityModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const id = button.getAttribute('data-id');
+                    const title = button.getAttribute('data-title');
+                    const author = button.getAttribute('data-author');
+                    const image = button.getAttribute('data-image');
+                    const price = button.getAttribute('data-price');
+                    const quantity = button.getAttribute('data-quantity');
+
+                    document.getElementById('updateItemId').value = id;
+                    document.getElementById('updateItemTitle').textContent = title;
+                    document.getElementById('updateItemAuthor').textContent = 'By ' + author;
+                    document.getElementById('updateItemImage').src = image;
+                    document.getElementById('updateItemPrice').textContent = price;
+                    document.getElementById('quantityInput').value = quantity;
+                });
+            }
+
+            // Handle delete item modal
+            const deleteItemModal = document.getElementById('deleteItemModal');
+            if (deleteItemModal) {
+                deleteItemModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const id = button.getAttribute('data-id');
+                    const title = button.getAttribute('data-title');
+                    const author = button.getAttribute('data-author');
+                    const image = button.getAttribute('data-image');
+
+                    document.getElementById('deleteItemId').value = id;
+                    document.getElementById('deleteItemTitle').textContent = title;
+                    document.getElementById('deleteItemAuthor').textContent = 'By ' + author;
+                    document.getElementById('deleteItemImage').src = image;
+                });
+            }
+
+            // Quantity adjustment buttons
+            const decreaseQuantityBtn = document.getElementById('decreaseQuantity');
+            const increaseQuantityBtn = document.getElementById('increaseQuantity');
+            const quantityInput = document.getElementById('quantityInput');
+
+            if (decreaseQuantityBtn && quantityInput) {
+                decreaseQuantityBtn.addEventListener('click', function () {
+                    const currentValue = parseInt(quantityInput.value);
+                    if (currentValue > 1) {
+                        quantityInput.value = currentValue - 1;
+                    }
+                });
+            }
+
+            if (increaseQuantityBtn && quantityInput) {
+                increaseQuantityBtn.addEventListener('click', function () {
+                    const currentValue = parseInt(quantityInput.value);
+                    if (currentValue < 10) {
+                        quantityInput.value = currentValue + 1;
+                    }
+                });
+            }
+        });
+    </script>
+}

@@ -23,7 +23,13 @@ public class User
         
         public string? AvatarImg { get; set; }
         
-        public string? Address { get; set; }
+        public string? HomeAddress { get; set; }
+        public string? WardName { get; set; }
+        public string? Province { get; set; }
+        public string? City { get; set; }
+        public string? District { get; set; }
+        [MaxLength(10)]
+        public string? Phone { get; set; }
         
         public int RoleId { get; set; }
         

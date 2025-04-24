@@ -93,13 +93,11 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         try
         {
             var books = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
-                c => true, 
+                c => true,
                 c => c.Category,
                 c => c.Author);
             var result = books.Where(
-                b => categoryIds.
-                    Contains(b.CategoryId)).
-                    ToList();
+                b => categoryIds.Contains(b.CategoryId)).ToList();
             var bookReturn = mapper.Map<ICollection<BookViewModel>>(result);
             return bookReturn;
         }
@@ -109,5 +107,4 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
             throw;
         }
     }
-    
 }

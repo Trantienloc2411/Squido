@@ -13,14 +13,14 @@ public class CategoryViewComponent(IHttpClientFactory httpClientFactory) : ViewC
             var client = httpClientFactory.CreateClient("Squido");
             var response = await client.GetAsync("/api/Category");
 
-            if (!response.IsSuccessStatusCode) return View(new HomeViewModal());
+            if (!response.IsSuccessStatusCode) return View(new HomeViewModel());
             var content = await response.Content.ReadAsStringAsync();
                 
             List<CategoryViewModel>? categories = JsonSerializer.Deserialize<List<CategoryViewModel>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
 
-            if (categories == null) return View(new HomeViewModal());
-            var homeViewModel = new HomeViewModal
+            if (categories == null) return View(new HomeViewModel());
+            var homeViewModel = new HomeViewModel
             {
                 Categories = categories
             };
