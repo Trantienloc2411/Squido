@@ -116,5 +116,59 @@ namespace Squido.Controllers
             }
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> CreateOrder(OrderViewModel orderViewModel)
+        {
+            try
+            {
+                var cart = HttpContext.Session.GetObject<List<CartItem>>("Cart") ?? new List<CartItem>();
+
+
+                // Check if the cart is empty
+                if (cart.Count == 0)
+                {
+                    TempData["Error"] = "Your cart is empty. Please add items to your cart before checking out.";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+
+                }
+
+
+
+
+
+
+                var client = httpClientFactory.CreateClient("Squido");
+
+                // Set authentication token
+                var token = HttpContext.Session.GetString("Token");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
+
+                var response = await client.PostAsJsonAsync("/api/Order", new { orderViewModel });
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["Success"] = "Order successfully created";
+                    HttpContext.Session.Remove("Cart");
+                    return RedirectToAction("Index", "HomeMvc");
+                }
+
+                // Get more details about the error
+                var errorContent = await response.Content.ReadAsStringAsync();
+                TempData["Error"] = $"Error creating order: {response.StatusCode} - {errorContent}";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Unexpected error occurred: {ex.Message}";
+                return RedirectToAction("Index");
+            }
+        }
     }
 }
