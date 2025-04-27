@@ -15,7 +15,7 @@ public class UnitOfWork(SquidoDbContext context) : IUnitOfWork
     private GenericRepository<User>? _userRepository;
     private GenericRepository<Category>? _categoryRepository;
     private GenericRepository<Order>? _orderRepository;
-    private GenericRepository<OrderItem> _orderItemRepository;
+    private GenericRepository<OrderItem>? _orderItemRepository;
     private GenericRepository<Rating>? _ratingRepository;
     private GenericRepository<Author>? _authorRepository;
     private GenericRepository<RefreshToken>? _refreshTokenRepository;

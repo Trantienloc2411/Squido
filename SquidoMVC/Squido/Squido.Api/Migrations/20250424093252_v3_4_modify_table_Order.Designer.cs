@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Models;
 
@@ -11,9 +12,11 @@ using WebApplication1.Models;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(SquidoDbContext))]
-    partial class SquidoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424093252_v3_4_modify_table_Order")]
+    partial class v3_4_modify_table_Order
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,12 +161,6 @@ namespace WebApplication1.Migrations
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("OrderNote")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("ShippingFee")
                         .HasPrecision(18, 2)
@@ -328,6 +325,9 @@ namespace WebApplication1.Migrations
                     b.Property<string>("Phone")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Province")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");

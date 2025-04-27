@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WebApplication1.Models.Entities;
 using WebApplication1.Models.enums;
@@ -16,11 +17,14 @@ public class Order
     public DateTime? ConfirmDate { get; set; }
     
     public DateTime? CompleteDate { get; set; }
-    
-        
-    public decimal TotalAmount { get; set; }
+    [DefaultValue(0.00)]
+    public decimal ShippingFee { get; set; } = 0;
+
+    public PaymentMethodEnum PaymentMethod {get;set;}
         
     public OrderStatusEnum Status { get; set; }
+
+    public string? OrderNote {get;set;}
         
     [ForeignKey("CustomerId")]
     public User Customer { get; set; }

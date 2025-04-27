@@ -192,4 +192,38 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             }
         }
     }
+    public Task UpdateAsync(T entity)
+    {
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
+
+        // Get the primary key value (assumes key property is named "Id")
+        var keyProperty = typeof(T).GetProperty("Id");
+        if (keyProperty == null)
+            throw new InvalidOperationException($"Entity '{typeof(T).Name}' does not have a property named 'Id'.");
+
+        var key = keyProperty.GetValue(entity);
+        if (key == null)
+            throw new InvalidOperationException("Entity key cannot be null.");
+
+        // Check if this entity is already being tracked
+        var trackedEntity = _context.ChangeTracker.Entries<T>()
+                                    .FirstOrDefault(e =>
+                                        e.State != EntityState.Detached &&
+                                        key.Equals(keyProperty.GetValue(e.Entity)));
+
+        if (trackedEntity != null)
+        {
+            // Detach the tracked entity
+            trackedEntity.State = EntityState.Detached;
+        }
+
+        // Attach and mark the new entity as modified
+        _context.Set<T>().Attach(entity);
+        _context.Entry(entity).State = EntityState.Modified;
+
+        return Task.CompletedTask;
+    }
+
+
 }

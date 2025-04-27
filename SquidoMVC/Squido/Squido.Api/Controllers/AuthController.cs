@@ -34,11 +34,11 @@ public class AuthController : ControllerBase
                     return BadRequest("Email or password is incorrect");
                 }
 
-                if ((bool)user.IsDeleted)
+                if ((bool)user!.IsDeleted!)
                 {
                     return Unauthorized("This account was deleted or not authorized.");
                 }
-                else if (user.Role.RoleId != 1 && user.Role.RoleId != 2)
+                else if (user.Role!.RoleId != 1 && user.Role.RoleId != 2)
                 {
                     return Unauthorized("You are not authorized to login.");
                 }
@@ -46,7 +46,7 @@ public class AuthController : ControllerBase
                 var roles = user.Role.RoleId;
 
                 // Generate tokens
-                string accessToken = jwtService.GenerateToken(user.Id!.ToString(), user.Username, roles);
+                string accessToken = jwtService.GenerateToken(user.Id!.ToString(), user!.Username!, roles);
                 var refreshToken = jwtService.GenerateRefreshToken(Guid.Parse(user.Id!.ToString()));
 
                 // Return tokens along with user info if needed

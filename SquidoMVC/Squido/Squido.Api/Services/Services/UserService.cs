@@ -6,6 +6,7 @@ using WebApplication1.Models.Entities;
 using WebApplication1.DAOs.Interfaces;
 using WebApplication1.Helper;
 using WebApplication1.Services.Interfaces;
+using WebApplication1.Models.enums;
 
 namespace WebApplication1.Services.Services;
 
@@ -19,12 +20,12 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
             var result = new UserViewModel();
             var user = await uoW.UserRepository.GetSingleWithIncludeAsync
                 (c => email == c.Email, c => c.Role);
-            if(BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
+            if (BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
             {
                 result = mapper.Map<UserViewModel>(user);
                 return result;
             }
-            
+
             return result = new UserViewModel();
         }
         catch (Exception e)
@@ -38,7 +39,7 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
     {
         try
         {
-            
+
             if (IsUserExists(registerRequestVm.Email))
             {
                 return ResponseFactory.Error<RegisterRequestVm>("User with the same email already exists", "USER_EXISTS");
@@ -77,5 +78,68 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
             throw;
         }
     }
-    
+
+    public async Task<ResponseMessage<UserViewModel>> GetUserByIdAsync(Guid userId)
+    {
+        try
+        {
+            var user = await uoW.UserRepository.GetSingleWithIncludeAsync(c => c.Id == userId, c => c.Role);
+            if (user is null)
+            {
+                return ResponseFactory.Error<UserViewModel>("User not found", "USER_NOT_FOUND");
+            }
+            var result = mapper.Map<UserViewModel>(user);
+            return ResponseFactory.Success(result, "User Found");
+        }
+        catch (System.Exception ex)
+        {
+            // 
+            return ResponseFactory.Exception<UserViewModel>(ex);
+        }
+    }
+
+    public async Task<ResponseMessage<UserViewModel>> UpdateUserAsync(UserViewModel userViewModel, Guid userId)
+    {
+        try
+        {
+            if (IsUserExists(userId))
+            {
+                var userOld = await uoW.UserRepository.GetSingleWithIncludeAsync(c => c.Id == userId, c => c.Role);
+                int role = userOld.RoleId;
+                GenderEnum gender = userOld.Gender;
+                // Map updated fields into the existing entity
+                mapper.Map(userViewModel, userOld, opt => opt.Items["IgnoreRole"] = false);
+
+                userOld.RoleId = role;
+                userOld.Gender = gender;
+
+                await uoW.UserRepository.UpdateAsync(userOld);
+                uoW.Save();
+
+                return ResponseFactory.Success(userViewModel, "User Updated");
+            }
+            else
+            {
+                return ResponseFactory.Error<UserViewModel>("User not found", "USER_NOT_FOUND");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            return ResponseFactory.Exception<UserViewModel>(ex);
+        }
+    }
+
+
+    private bool IsUserExists(Guid userId)
+    {
+        try
+        {
+            return uoW.UserRepository.GetAll().Any(c => c.Id == userId);
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine(ex);
+            throw;
+        }
+    }
 }
