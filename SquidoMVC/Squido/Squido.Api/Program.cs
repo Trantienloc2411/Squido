@@ -30,6 +30,7 @@ public class Program
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<IBookService, BookService>();
         builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

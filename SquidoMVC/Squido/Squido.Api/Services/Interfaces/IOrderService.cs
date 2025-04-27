@@ -5,5 +5,5 @@ namespace WebApplication1.Services.Interfaces;
 
 public interface IOrderService
 {
-    Task<ResponseMessage<OrderResultViewModel>> CreateOrderAsync(OrderViewModel orderViewModel);
+    Task<ResponseMessage<OrderResultViewModel>> CreateOrderAsync(OrderViewModel orderViewModel, List<OrderItemViewModel> orderItemViewModels);
 }

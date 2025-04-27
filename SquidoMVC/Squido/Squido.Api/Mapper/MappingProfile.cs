@@ -41,5 +41,11 @@ public class MappingProfile : Profile
         CreateMap<OrderItemViewModel, OrderItem>().ReverseMap();
         CreateMap<Order, OrderViewModel>().ReverseMap();
 
+        CreateMap<Order, OrderResultViewModel>()
+            .ForMember(dest => dest.UserViewModel, opt => opt.MapFrom(src => src.Customer))
+            .ForMember(dest => dest.OrderItemViewModels, opt => opt.MapFrom(src => src.OrderItems))
+            .ReverseMap();
+
+
     }
 }
