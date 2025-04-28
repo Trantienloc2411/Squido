@@ -8,4 +8,8 @@ public interface IUserService
 {
     Task<UserViewModel> GetUserByEmailAndPasswordAsync(string email, string password);
     Task<ResponseMessage<RegisterRequestVm>> CreateUserAsync(RegisterRequestVm registerRequest);
+    Task<ResponseMessage<UserViewModel>> GetUserByIdAsync(Guid userId);
+
+    Task<ResponseMessage<UserViewModel>> UpdateUserAsync(UserViewModel userViewModel, Guid userId); // <T>
+
 }

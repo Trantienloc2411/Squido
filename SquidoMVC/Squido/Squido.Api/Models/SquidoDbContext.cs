@@ -89,7 +89,7 @@ namespace WebApplication1.Models
                 .Property(b => b.Price)
                 .HasPrecision(18, 2);
             modelBuilder.Entity<Order>()
-                .Property(o => o.TotalAmount)
+                .Property(o => o.ShippingFee)
                 .HasPrecision(18, 2);
             modelBuilder.Entity<OrderItem>()
                 .Property(o => o.UnitPrice)

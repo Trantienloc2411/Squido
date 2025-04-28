@@ -25,7 +25,6 @@ public class User
         
         public string? HomeAddress { get; set; }
         public string? WardName { get; set; }
-        public string? Province { get; set; }
         public string? City { get; set; }
         public string? District { get; set; }
         [MaxLength(10)]

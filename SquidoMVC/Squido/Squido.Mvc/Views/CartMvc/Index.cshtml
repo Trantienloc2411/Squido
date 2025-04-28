@@ -102,9 +102,9 @@
                                                 </td>
                                             </tr>
                                             {
-                                                Subtotal += (decimal)(item.Price * item.QuantityCart);
+                                                Subtotal += (decimal)(item.Price! * item!.QuantityCart!);
                                                 TotalQuantity += item.QuantityCart;
-                                                Total += Subtotal;
+                                                Total = Subtotal;
                                             }
 
                                         }
