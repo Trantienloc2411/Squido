@@ -1,5 +1,4 @@
-"use client"
-
+ 
 import { useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../redux/hooks"
 import { fetchStats } from "../../redux/slices/statsSlice"
@@ -7,8 +6,9 @@ import { Card, CardContent } from "../ui/card"
 import { ShoppingBag, Tags, Users, DollarSign } from "lucide-react"
 
 function DashboardStats() {
-  const dispatch = useAppDispatch()
-  const { stats, loading } = useAppSelector((state) => state.stats)
+  const dispatch = useAppDispatch();
+  // Access the stats directly from the state (no nested "stats" property)
+  const { totalProducts, totalCategories, totalCustomers, totalRevenue, loading } = useAppSelector((state) => state.stats)
 
   useEffect(() => {
     dispatch(fetchStats())
@@ -17,28 +17,28 @@ function DashboardStats() {
   const statItems = [
     {
       title: "Total Products",
-      value: stats?.totalProducts || 0,
+      value: totalProducts,
       icon: ShoppingBag,
       color: "text-blue-500",
       bgColor: "bg-blue-100",
     },
     {
       title: "Total Categories",
-      value: stats?.totalCategories || 0,
+      value: totalCategories,
       icon: Tags,
       color: "text-green-500",
       bgColor: "bg-green-100",
     },
     {
       title: "Total Customers",
-      value: stats?.totalCustomers || 0,
+      value: totalCustomers,
       icon: Users,
       color: "text-purple-500",
       bgColor: "bg-purple-100",
     },
     {
       title: "Total Revenue",
-      value: `$${stats?.totalRevenue?.toFixed(2) || "0.00"}`,
+      value: `$${totalRevenue.toFixed(2)}`,
       icon: DollarSign,
       color: "text-orange-500",
       bgColor: "bg-orange-100",

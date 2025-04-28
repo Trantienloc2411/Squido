@@ -1,11 +1,10 @@
-"use client"
 
 import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../redux/hooks"
 import { fetchCategories, deleteCategory, updateCategory } from "../../redux/slices/categoriesSlice"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
+import { Table, TableBody, PaginatedTable, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 import { Button } from "../ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import {
@@ -81,7 +80,7 @@ function CategoryList() {
   return (
     <div>
       <div className="rounded-md border">
-        <Table>
+        <PaginatedTable data={categories} itemsPerPage={5}>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
@@ -170,7 +169,7 @@ function CategoryList() {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+        </PaginatedTable>
       </div>
     </div>
   )

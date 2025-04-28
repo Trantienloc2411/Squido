@@ -1,4 +1,4 @@
-"use client"
+ 
 
 import { Bell, Menu, Search, User } from "lucide-react"
 import { Input } from "../ui/input"

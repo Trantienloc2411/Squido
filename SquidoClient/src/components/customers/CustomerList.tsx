@@ -1,4 +1,4 @@
-"use client"
+ 
 
 import { useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../redux/hooks"

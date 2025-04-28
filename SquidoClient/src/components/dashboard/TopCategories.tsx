@@ -1,17 +1,23 @@
-"use client"
 
 import { useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../redux/hooks"
-import { fetchCategories } from "../../redux/slices/categoriesSlice"
+import { fetchStats } from "../../redux/slices/statsSlice"
 import { Skeleton } from "../ui/skeleton"
 
 function TopCategories() {
   const dispatch = useAppDispatch()
-  const { categories, loading } = useAppSelector((state) => state.categories)
+  const { topCategories, loading } = useAppSelector((state) => state.stats)
 
   useEffect(() => {
-    dispatch(fetchCategories())
+    dispatch(fetchStats())
   }, [dispatch])
+
+
+  const categoriesWithCount = topCategories?.map((category) => ({
+    id: category.id,
+    name: category.name,
+    count: category.bookCount,
+  })) || []
 
   if (loading) {
     return (
@@ -26,18 +32,12 @@ function TopCategories() {
     )
   }
 
-  // Mock data for product counts
-  const categoriesWithCount = categories.slice(0, 5).map((category, index) => ({
-    ...category,
-    count: 100 - index * 15,
-  }))
-
   return (
     <div className="space-y-4">
       {categoriesWithCount.map((category) => (
         <div key={category.id} className="flex items-center justify-between">
           <p className="font-medium">{category.name}</p>
-          <p className="text-sm text-muted-foreground">{category.count} products</p>
+          <p className="text-sm text-muted-foreground">{category.count} book</p>
         </div>
       ))}
     </div>

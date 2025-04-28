@@ -1,4 +1,4 @@
-"use client"
+ 
 
 import { useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
