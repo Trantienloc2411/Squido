@@ -11,6 +11,7 @@ public class BookViewModel
     public int Quantity {get;set;}
     public decimal Price {get;set;}
     public int BuyCount { get; set; }
+    public List<string>? ImageUrls { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
     

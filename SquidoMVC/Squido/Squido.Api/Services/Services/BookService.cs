@@ -11,7 +11,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
     public async Task<ICollection<BookViewModel>> GetBooks(string? keyword = null)
     {
         var bookList = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
-            p => true,
+            p => p.IsDeleted == false,
             p => p.Category,
             p => p.Author);
 
@@ -63,7 +63,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
 
             // Fetch books
             var booksList = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
-                b => b.AuthorId == parsedAuthorId,
+                b => b.AuthorId == parsedAuthorId && b.IsDeleted == false,
                 b => b.Author
             );
 
@@ -93,7 +93,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         try
         {
             var books = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
-                c => true,
+                c => c.IsDeleted == false,
                 c => c.Category,
                 c => c.Author);
             var result = books.Where(

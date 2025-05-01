@@ -10,7 +10,7 @@ public class CategoryService(IUnitOfWork unitOfWork, IMapper mapper) : ICategory
 {
     public async Task<IEnumerable<CategoryViewModel>> GetCategories()
     {
-        var categories = await unitOfWork.CategoryRepository.GetAllWithIncludeAsync(c => true);
+        var categories = await unitOfWork.CategoryRepository.GetAllWithIncludeAsync(c => c.IsDeleted == false);
         return mapper.Map<IEnumerable<CategoryViewModel>>(categories);
     }
 }
