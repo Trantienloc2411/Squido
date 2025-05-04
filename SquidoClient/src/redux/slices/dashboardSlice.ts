@@ -1,12 +1,33 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
+import { fetchFromAPI } from "../../utils/api"
+
+interface TopBook {
+  bookId: string
+  title: string
+  categoryName: string
+  authorName: string | null
+  quantity: number
+  price: number
+  buyCount: number
+  imageUrls: string[]
+  createdDate: string
+  updatedDate: string | null
+}
+
+interface TopCategory {
+  categoryId: number
+  name: string
+  description: string | null
+  bookCount: number
+}
 
 interface DashboardStats {
   totalBooks: number
-  totalUsers: number
-  totalOrders: number
-  revenue: number
-  recentOrders: any[]
-  topSellingBooks: any[]
+  totalCategories: number
+  totalCustomers: number
+  totalRevenues: number
+  topBooks: TopBook[]
+  topCategories: TopCategory[]
 }
 
 interface DashboardState {
@@ -15,22 +36,14 @@ interface DashboardState {
   error: string | null
 }
 
-// Mock API call
+// Fetch dashboard stats from API
 export const fetchDashboardStats = createAsyncThunk("dashboard/fetchStats", async () => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-
-  // Mock data
-  const stats: DashboardStats = {
-    totalBooks: 1250,
-    totalUsers: 845,
-    totalOrders: 328,
-    revenue: 15680.75,
-    recentOrders: [],
-    topSellingBooks: [],
+  try {
+    const stats = await fetchFromAPI("Stats")
+    return stats
+  } catch (error) {
+    throw new Error("Failed to fetch dashboard statistics")
   }
-
-  return stats
 })
 
 const initialState: DashboardState = {

@@ -1,55 +1,50 @@
 import type React from "react"
-import { Box, Flex, Text, Progress, useColorModeValue, Image } from "@chakra-ui/react"
+import { Box, Flex, Text, Progress, useColorModeValue, Image, Skeleton, SkeletonText } from "@chakra-ui/react"
 
-const books = [
-  {
-    id: 1,
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    sales: 120,
-    image: "/open-book-library.png",
-  },
-  {
-    id: 2,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    sales: 95,
-    image: "/open-book-library.png",
-  },
-  {
-    id: 3,
-    title: "1984",
-    author: "George Orwell",
-    sales: 85,
-    image: "/open-book-library.png",
-  },
-  {
-    id: 4,
-    title: "The Hobbit",
-    author: "J.R.R. Tolkien",
-    sales: 75,
-    image: "/open-book-library.png",
-  },
-  {
-    id: 5,
-    title: "Pride and Prejudice",
-    author: "Jane Austen",
-    sales: 65,
-    image: "/open-book-library.png",
-  },
-]
+interface TopBook {
+  bookId: string
+  title: string
+  categoryName: string
+  authorName: string | null
+  quantity: number
+  price: number
+  buyCount: number
+  imageUrls: string[]
+  createdDate: string
+  updatedDate: string | null
+}
 
-const maxSales = Math.max(...books.map((book) => book.sales))
+interface TopSellingBooksProps {
+  books?: TopBook[]
+  isLoading?: boolean
+}
 
-const TopSellingBooks: React.FC = () => {
+const TopSellingBooks: React.FC<TopSellingBooksProps> = ({ books = [], isLoading = false }) => {
   const progressColorScheme = useColorModeValue("brand", "brand")
+  const maxQuantity = books.length > 0 ? Math.max(...books.map((book) => book.quantity)) : 1
+
+  if (isLoading) {
+    return (
+      <Box>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Flex key={i} mb={4} align="center">
+            <Skeleton height="40px" width="40px" mr={3} />
+            <Box flex="1">
+              <SkeletonText noOfLines={2} spacing="2" />
+              <Skeleton height="8px" mt={1} />
+            </Box>
+          </Flex>
+        ))}
+      </Box>
+    )
+  }
 
   return (
     <Box>
       {books.map((book) => (
-        <Flex key={book.id} mb={4} align="center">
+        <Flex key={book.bookId} mb={4} align="center">
           <Image
-            src={book.image || "/placeholder.svg"}
+            src={book.imageUrls?.[0] || "/placeholder.svg?height=40&width=30&query=book"}
             alt={book.title}
             boxSize="40px"
             objectFit="cover"
@@ -61,13 +56,13 @@ const TopSellingBooks: React.FC = () => {
               <Text fontWeight="medium" noOfLines={1}>
                 {book.title}
               </Text>
-              <Text fontWeight="bold">{book.sales}</Text>
+              <Text fontWeight="bold">{book.quantity}</Text>
             </Flex>
             <Text fontSize="sm" color="gray.500" mb={1} noOfLines={1}>
-              {book.author}
+              {book.categoryName}
             </Text>
             <Progress
-              value={(book.sales / maxSales) * 100}
+              value={(book.quantity / maxQuantity) * 100}
               size="sm"
               colorScheme={progressColorScheme}
               borderRadius="full"

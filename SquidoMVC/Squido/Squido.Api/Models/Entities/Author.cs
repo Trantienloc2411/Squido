@@ -8,6 +8,7 @@ public class Author
     
     public string FullName { get; set; }
     public string? Bio { get; set; }
+    public bool IsDeleted { get; set; } = false;
     public string? ImageUrl { get; set; }
     public ICollection<Book> Books { get; set; }
 }

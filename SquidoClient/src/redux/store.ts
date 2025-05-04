@@ -4,6 +4,7 @@ import bookReducer from "./slices/bookSlice"
 import userReducer from "./slices/userSlice"
 import orderReducer from "./slices/orderSlice"
 import dashboardReducer from "./slices/dashboardSlice"
+import authorReducer from "./slices/authorSlice"
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     users: userReducer,
     orders: orderReducer,
     dashboard: dashboardReducer,
+    authors: authorReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

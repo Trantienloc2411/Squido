@@ -13,7 +13,8 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         var bookList = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
             p => p.IsDeleted == false,
             p => p.Category,
-            p => p.Author);
+            p => p.Author,
+            p => p.ImageBooks);
 
         if (!string.IsNullOrWhiteSpace(keyword))
         {
@@ -23,6 +24,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         }
 
         var bookReturn = mapper.Map<ICollection<BookViewModel>>(bookList);
+        
         return bookReturn;
     }
 
@@ -41,7 +43,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         {
             
             var book = await unitOfWork.BookRepository.GetSingleWithIncludeAsync(t => t.BookId.ToLower() == id.ToLower(), t => t.Category,
-                t => t.Author);
+                t => t.Author, t => t.ImageBooks);
             return book;
         }
         catch (Exception e)
@@ -64,7 +66,9 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
             // Fetch books
             var booksList = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
                 b => b.AuthorId == parsedAuthorId && b.IsDeleted == false,
-                b => b.Author
+                b => b.Author,
+                b => b.Category,
+                b => b.ImageBooks
             );
 
             // If there's a currentBook, exclude it
@@ -95,7 +99,8 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
             var books = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
                 c => c.IsDeleted == false,
                 c => c.Category,
-                c => c.Author);
+                c => c.Author,
+                c => c.ImageBooks);
             var result = books.Where(
                 b => categoryIds.Contains(b.CategoryId)).ToList();
             var bookReturn = mapper.Map<ICollection<BookViewModel>>(result);
@@ -106,5 +111,63 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
             Console.WriteLine(e);
             throw;
         }
+    }
+
+    public async Task<ResponseMessage<BookViewModel>> CreateBook(CreateBookViewModel bookViewModel)
+    {
+        try
+        {
+            var book = mapper.Map<Book>(bookViewModel);
+            book.BookId = GenerateBookId();
+            book.CreatedDate = DateTime.Now;
+            book.IsDeleted = false;
+            await unitOfWork.BookRepository.AddAsync(book);
+
+            List<ImageBook> imageBooks = new List<ImageBook>();
+            foreach (var image in bookViewModel.ImageUrls)
+            {
+                var imageBook = new ImageBook
+                {
+                    BookId = book.BookId,
+                    UrlImage = image,
+                };
+                imageBooks.Add(imageBook);
+            }
+            unitOfWork.ImageBookRepository.AddRange(imageBooks);
+            unitOfWork.Save();
+            var result = mapper.Map<BookViewModel>(book);
+            return new ResponseMessage<BookViewModel>
+            {
+                IsSuccess = true,
+                Message = "Create Book Success",
+                Data = result
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return new ResponseMessage<BookViewModel>
+            {
+                IsSuccess = false,
+                Message = "Create Book Failed",
+                Data = null
+            };
+        }
+    }
+
+    public Task<ResponseMessage<BookViewModel>> UpdateBook(string id, BookViewModel bookViewModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseMessage<BookViewModel>> DeleteBook(string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static string GenerateBookId()
+    {
+        var bookId = Guid.NewGuid().ToString();
+        return bookId;
     }
 }

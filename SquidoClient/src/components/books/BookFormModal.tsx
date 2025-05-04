@@ -14,14 +14,12 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Textarea,
   Select,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  SimpleGrid,
   FormErrorMessage,
   Flex,
   Image,
@@ -29,12 +27,19 @@ import {
   useToast,
   VStack,
   Box,
+  Text,
+  Textarea,
+  Progress,
+  SimpleGrid,
+  Spinner,
 } from "@chakra-ui/react"
-import { FiUpload, FiX } from "react-icons/fi"
-import { useDispatch } from "react-redux"
-import type { AppDispatch } from "../../redux/store"
-import { createBook, updateBook } from "../../redux/slices/bookSlice"
+import { FiUpload, FiX, FiAlertCircle } from "react-icons/fi"
+import { useDispatch, useSelector } from "react-redux"
+import type { AppDispatch, RootState } from "../../redux/store"
+import { createBook, updateBook, fetchCategories, fetchBooks, fetchBookById } from "../../redux/slices/bookSlice"
+import { fetchAuthors } from "../../redux/slices/authorSlice"
 import type { Book } from "../../types/book"
+import { validateImage, uploadImage } from "../../utils/supabaseStorage"
 
 interface BookFormModalProps {
   isOpen: boolean
@@ -42,59 +47,114 @@ interface BookFormModalProps {
   book: Book | null
 }
 
+interface BookFormData {
+  title: string
+  categoryId: number | null
+  authorId: string | null
+  description: string
+  quantity: number
+  price: number
+  imageUrls: string[]
+}
+
 const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book }) => {
   const dispatch = useDispatch<AppDispatch>()
   const toast = useToast()
+  const { categories, categoriesLoading, bookDetail } = useSelector((state: RootState) => state.books)
+  const { authors, loading: authorsLoading } = useSelector((state: RootState) => state.authors)
 
-  const [formData, setFormData] = useState<Partial<Book>>({
+  const [formData, setFormData] = useState<BookFormData>({
     title: "",
-    author: "",
-    isbn: "",
+    categoryId: null,
+    authorId: null,
     description: "",
-    category: "",
+    quantity: 0,
     price: 0,
-    stock: 0,
-    publisher: "",
-    publishedDate: "",
-    language: "English",
-    pages: 0,
-    coverImage: "",
+    imageUrls: [],
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [imagePreview, setImagePreview] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [isUploading, setIsUploading] = useState(false)
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false)
 
+  // Fetch categories and authors when the modal opens
   useEffect(() => {
-    if (book) {
-      setFormData(book)
-      setImagePreview(book.coverImage || "")
-    } else {
+    if (isOpen) {
+      dispatch(fetchCategories())
+      dispatch(fetchAuthors())
+
+      // If editing a book, fetch its full details
+      if (book) {
+        setIsLoadingDetails(true)
+        dispatch(fetchBookById(book.bookId))
+          .unwrap()
+          .then(() => {
+            setIsLoadingDetails(false)
+          })
+          .catch((err) => {
+            console.error("Error fetching book details:", err)
+            setIsLoadingDetails(false)
+            toast({
+              title: "Error",
+              description: "Failed to load book details. Please try again.",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            })
+          })
+      }
+    }
+  }, [dispatch, isOpen, book, toast])
+
+  // Update form data when book details are loaded
+  useEffect(() => {
+    if (book && bookDetail) {
+      // Find the category ID based on category name
+      const categoryId = categories.find((cat) => cat.name === book.categoryName)?.categoryId || null
+
+      // Find the author ID if available in the book detail
+      const authorId = bookDetail.book?.authorId || null
+
+      setFormData({
+        title: book.title || "",
+        categoryId,
+        authorId,
+        description: bookDetail.bookDescription || "",
+        quantity: book.quantity || 0,
+        price: book.price || 0,
+        imageUrls: book.imageUrls || [],
+      })
+
+      // Set image preview if available
+      if (book.imageUrls && book.imageUrls.length > 0) {
+        setImagePreview(book.imageUrls[0])
+      } else {
+        setImagePreview("")
+      }
+    } else if (!book) {
+      // Reset form for new book
       setFormData({
         title: "",
-        author: "",
-        isbn: "",
+        categoryId: null,
+        authorId: null,
         description: "",
-        category: "",
+        quantity: 0,
         price: 0,
-        stock: 0,
-        publisher: "",
-        publishedDate: "",
-        language: "English",
-        pages: 0,
-        coverImage: "",
+        imageUrls: [],
       })
       setImagePreview("")
     }
-  }, [book, isOpen])
+  }, [book, bookDetail, categories])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
     if (!formData.title) newErrors.title = "Title is required"
-    if (!formData.author) newErrors.author = "Author is required"
-    if (!formData.isbn) newErrors.isbn = "ISBN is required"
-    if (!formData.category) newErrors.category = "Category is required"
+    if (!formData.categoryId) newErrors.categoryId = "Category is required"
+    if (!formData.authorId) newErrors.authorId = "Author is required"
     if (formData.price === undefined || formData.price < 0) {
       newErrors.price = "Price must be a positive number"
     }
@@ -105,29 +165,98 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book }) 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "categoryId" || name === "authorId"
+          ? value
+            ? name === "categoryId"
+              ? Number.parseInt(value, 10)
+              : value
+            : null
+          : value,
+    }))
   }
 
   const handleNumberChange = (name: string, value: number) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle direct price input to allow decimal values
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number.parseFloat(e.target.value)
+    if (!isNaN(value)) {
+      setFormData((prev) => ({ ...prev, price: value }))
+    } else if (e.target.value === "") {
+      setFormData((prev) => ({ ...prev, price: 0 }))
+    }
+  }
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
+    if (!file) return
+
+    // Validate the image
+    const validationError = validateImage(file)
+    if (validationError) {
+      toast({
+        title: "Invalid image",
+        description: validationError,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      })
+      return
+    }
+
+    try {
+      setIsUploading(true)
+      setUploadProgress(10)
+
+      // Create a preview
       const reader = new FileReader()
       reader.onloadend = () => {
         const result = reader.result as string
         setImagePreview(result)
-        setFormData((prev) => ({ ...prev, coverImage: result }))
+        setUploadProgress(30)
       }
       reader.readAsDataURL(file)
+
+      // Upload to Supabase
+      setUploadProgress(50)
+      const imageUrl = await uploadImage(file)
+      setUploadProgress(100)
+
+      // Update form data - replace any existing image with the new one
+      setFormData((prev) => ({
+        ...prev,
+        imageUrls: [imageUrl], // Only store one image
+      }))
+
+      toast({
+        title: "Image uploaded",
+        description: "The image has been uploaded successfully.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      })
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to upload image",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsUploading(false)
+      setUploadProgress(0)
     }
   }
 
   const clearImage = () => {
     setImagePreview("")
-    setFormData((prev) => ({ ...prev, coverImage: "" }))
+    setFormData((prev) => ({ ...prev, imageUrls: [] }))
   }
 
   const handleSubmit = async () => {
@@ -137,29 +266,39 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book }) 
 
     try {
       if (book) {
-        await dispatch(updateBook({ id: book.id, bookData: { ...formData, id: book.id } as Book }))
-        toast({
-          title: "Book updated",
-          description: "The book has been updated successfully.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        })
+        const result = await dispatch(updateBook({ id: book.bookId, bookData: formData })).unwrap()
+        if (result) {
+          toast({
+            title: "Book updated",
+            description: "The book has been updated successfully.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          })
+          // Refresh the book list after successful update
+          dispatch(fetchBooks({}))
+          onClose()
+        }
       } else {
-        await dispatch(createBook(formData as Book))
-        toast({
-          title: "Book created",
-          description: "The book has been created successfully.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        })
+        const result = await dispatch(createBook(formData)).unwrap()
+        if (result) {
+          toast({
+            title: "Book created",
+            description: "The book has been created successfully.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          })
+          // Refresh the book list after successful creation
+          dispatch(fetchBooks({}))
+          onClose()
+        }
       }
-      onClose()
     } catch (error) {
+      console.error("Error submitting form:", error)
       toast({
         title: "Error",
-        description: "An error occurred. Please try again.",
+        description: error instanceof Error ? error.message : "An error occurred. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -167,6 +306,25 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book }) 
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  // Show loading state while fetching book details
+  if (isLoadingDetails) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{book ? "Edit Book" : "Add New Book"}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex direction="column" align="center" justify="center" py={10}>
+              <Spinner size="xl" mb={4} color="blue.500" />
+              <Text>Loading book details...</Text>
+            </Flex>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    )
   }
 
   return (
@@ -179,120 +337,94 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book }) 
           <VStack spacing={4}>
             <FormControl isInvalid={!!errors.title}>
               <FormLabel>Title</FormLabel>
-              <Input name="title" value={formData.title || ""} onChange={handleChange} placeholder="Book title" />
+              <Input name="title" value={formData.title} onChange={handleChange} placeholder="Book title" />
               <FormErrorMessage>{errors.title}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.author}>
-              <FormLabel>Author</FormLabel>
-              <Input name="author" value={formData.author || ""} onChange={handleChange} placeholder="Author name" />
-              <FormErrorMessage>{errors.author}</FormErrorMessage>
-            </FormControl>
-
-            <FormControl isInvalid={!!errors.isbn}>
-              <FormLabel>ISBN</FormLabel>
-              <Input name="isbn" value={formData.isbn || ""} onChange={handleChange} placeholder="ISBN number" />
-              <FormErrorMessage>{errors.isbn}</FormErrorMessage>
-            </FormControl>
-
-            <FormControl isInvalid={!!errors.category}>
+            <FormControl isInvalid={!!errors.categoryId}>
               <FormLabel>Category</FormLabel>
               <Select
-                name="category"
-                value={formData.category || ""}
+                name="categoryId"
+                value={formData.categoryId?.toString() || ""}
                 onChange={handleChange}
                 placeholder="Select category"
+                isDisabled={categoriesLoading}
               >
-                <option value="fiction">Fiction</option>
-                <option value="non-fiction">Non-Fiction</option>
-                <option value="mystery">Mystery</option>
-                <option value="sci-fi">Science Fiction</option>
-                <option value="fantasy">Fantasy</option>
-                <option value="biography">Biography</option>
-                <option value="history">History</option>
-                <option value="romance">Romance</option>
-                <option value="horror">Horror</option>
-                <option value="children">Children's</option>
-                <option value="self-help">Self-Help</option>
-                <option value="education">Education</option>
+                {categoriesLoading ? (
+                  <option disabled>Loading categories...</option>
+                ) : (
+                  categories.map((cat) => (
+                    <option key={cat.categoryId} value={cat.categoryId.toString()}>
+                      {cat.name}
+                    </option>
+                  ))
+                )}
               </Select>
-              <FormErrorMessage>{errors.category}</FormErrorMessage>
+              {categoriesLoading && (
+                <Flex align="center" mt={2}>
+                  <Spinner size="sm" mr={2} />
+                  <Text fontSize="sm">Loading categories...</Text>
+                </Flex>
+              )}
+              <FormErrorMessage>{errors.categoryId}</FormErrorMessage>
             </FormControl>
 
-            <SimpleGrid columns={2} spacing={4}>
-              <FormControl isInvalid={!!errors.price}>
-                <FormLabel>Price ($)</FormLabel>
-                <NumberInput
-                  min={0}
-                  precision={2}
-                  value={formData.price}
-                  onChange={(_, value) => handleNumberChange("price", value)}
+            <FormControl isInvalid={!!errors.authorId}>
+              <FormLabel>Author</FormLabel>
+              {authorsLoading ? (
+                <Flex align="center" mb={2}>
+                  <Spinner size="sm" mr={2} />
+                  <Text fontSize="sm">Loading authors...</Text>
+                </Flex>
+              ) : (
+                <Select
+                  name="authorId"
+                  value={formData.authorId || ""}
+                  onChange={handleChange}
+                  placeholder="Select author"
                 >
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-                <FormErrorMessage>{errors.price}</FormErrorMessage>
-              </FormControl>
-
-              <FormControl>
-                <FormLabel>Stock</FormLabel>
-                <NumberInput min={0} value={formData.stock} onChange={(_, value) => handleNumberChange("stock", value)}>
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </FormControl>
-            </SimpleGrid>
+                  {authors?.map((author) => (
+                    <option key={author.authorId} value={author.authorId}>
+                      {author.fullName}
+                    </option>
+                  ))}
+                </Select>
+              )}
+              <FormErrorMessage>{errors.authorId}</FormErrorMessage>
+            </FormControl>
 
             <FormControl>
               <FormLabel>Description</FormLabel>
               <Textarea
                 name="description"
-                value={formData.description || ""}
+                value={formData.description}
                 onChange={handleChange}
                 placeholder="Book description"
-                rows={3}
+                rows={4}
               />
             </FormControl>
 
             <SimpleGrid columns={2} spacing={4}>
-              <FormControl>
-                <FormLabel>Publisher</FormLabel>
+              <FormControl isInvalid={!!errors.price}>
+                <FormLabel>Price ($)</FormLabel>
                 <Input
-                  name="publisher"
-                  value={formData.publisher || ""}
-                  onChange={handleChange}
-                  placeholder="Publisher"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.price}
+                  onChange={handlePriceChange}
+                  placeholder="0.00"
                 />
+                <FormErrorMessage>{errors.price}</FormErrorMessage>
               </FormControl>
 
               <FormControl>
-                <FormLabel>Published Date</FormLabel>
-                <Input name="publishedDate" type="date" value={formData.publishedDate || ""} onChange={handleChange} />
-              </FormControl>
-            </SimpleGrid>
-
-            <SimpleGrid columns={2} spacing={4}>
-              <FormControl>
-                <FormLabel>Language</FormLabel>
-                <Select name="language" value={formData.language || "English"} onChange={handleChange}>
-                  <option value="English">English</option>
-                  <option value="Spanish">Spanish</option>
-                  <option value="French">French</option>
-                  <option value="German">German</option>
-                  <option value="Chinese">Chinese</option>
-                  <option value="Japanese">Japanese</option>
-                </Select>
-              </FormControl>
-
-              <FormControl>
-                <FormLabel>Pages</FormLabel>
-                <NumberInput min={1} value={formData.pages} onChange={(_, value) => handleNumberChange("pages", value)}>
+                <FormLabel>Quantity</FormLabel>
+                <NumberInput
+                  min={0}
+                  value={formData.quantity}
+                  onChange={(_, value) => handleNumberChange("quantity", value)}
+                >
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -324,17 +456,37 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book }) 
                     />
                   </Box>
                 ) : (
-                  <Button as="label" htmlFor="cover-upload" leftIcon={<FiUpload />} variant="outline" cursor="pointer">
-                    Upload Cover
+                  <Button
+                    as="label"
+                    htmlFor="cover-upload"
+                    leftIcon={<FiUpload />}
+                    variant="outline"
+                    cursor="pointer"
+                    isDisabled={isUploading}
+                  >
+                    Upload Cover (JPG only, max 200KB)
                     <input
                       id="cover-upload"
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/jpg"
                       onChange={handleImageChange}
                       style={{ display: "none" }}
+                      disabled={isUploading}
                     />
                   </Button>
                 )}
+                {isUploading && (
+                  <Box width="100%">
+                    <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />
+                    <Text fontSize="sm">Uploading: {uploadProgress}%</Text>
+                  </Box>
+                )}
+                <Text fontSize="xs" color="gray.500">
+                  <Box as="span" display="inline-flex" alignItems="center" mr={1}>
+                    <FiAlertCircle />
+                  </Box>
+                  Only one JPG image up to 200KB is allowed
+                </Text>
               </Flex>
             </FormControl>
           </VStack>

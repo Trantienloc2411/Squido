@@ -1,194 +1,428 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
-import type { Book } from "../../types/book"
+import { fetchFromAPI } from "../../utils/api"
+import type { Book, BookResponse, BookParams } from "../../types/book"
+import type { Category } from "../../types/category"
+import type { BookDetail } from "../../types/book"
 
+// Update the BookState interface to include error
 interface BookState {
   books: Book[]
   currentBook: Book | null
+  bookDetail: BookDetail | null
+  categories: Category[]
   loading: boolean
+  categoriesLoading: boolean
   error: string | null
+  pagination: {
+    currentPage: number
+    pageCount: number
+    totalCount: number
+    hasMore: boolean
+  }
 }
 
-interface FetchBooksParams {
-  search?: string
-  category?: string
-}
+// Update the fetchBooks function in bookSlice.ts
 
-// Mock data
-const mockBooks: Book[] = [
-  {
-    id: "1",
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    isbn: "9780743273565",
-    description: "A classic novel about the American Dream.",
-    category: "fiction",
-    price: 12.99,
-    stock: 25,
-    publisher: "Scribner",
-    publishedDate: "2004-09-30",
-    language: "English",
-    pages: 180,
-    coverImage: "/open-book-library.png",
-  },
-  {
-    id: "2",
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    isbn: "9780061120084",
-    description: "A novel about racial injustice in the American South.",
-    category: "fiction",
-    price: 14.99,
-    stock: 18,
-    publisher: "HarperPerennial",
-    publishedDate: "2006-05-23",
-    language: "English",
-    pages: 336,
-    coverImage: "/open-book-library.png",
-  },
-  {
-    id: "3",
-    title: "1984",
-    author: "George Orwell",
-    isbn: "9780451524935",
-    description: "A dystopian novel about totalitarianism.",
-    category: "sci-fi",
-    price: 10.99,
-    stock: 0,
-    publisher: "Signet Classic",
-    publishedDate: "1961-01-01",
-    language: "English",
-    pages: 328,
-    coverImage: "/open-book-library.png",
-  },
-]
+// Fetch books from API with pagination
+export const fetchBooks = createAsyncThunk("books/fetchBooks", async (params: BookParams = {}, { rejectWithValue }) => {
+  const { page = 1, pageSize = 20, keyword, categoryId } = params
 
-// Mock API calls
-export const fetchBooks = createAsyncThunk("books/fetchBooks", async (params: FetchBooksParams = {}) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  try {
+    console.log("Fetching books with params:", params)
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5083/api"
+    console.log("Using API URL:", API_URL)
 
-  let filteredBooks = [...mockBooks]
+    let url
+    let queryParams
 
-  if (params.search) {
-    const searchLower = params.search.toLowerCase()
-    filteredBooks = filteredBooks.filter(
-      (book) =>
-        book.title.toLowerCase().includes(searchLower) ||
-        book.author.toLowerCase().includes(searchLower) ||
-        book.isbn.includes(params.search),
-    )
+    // If categoryId is provided, use the Filter endpoint
+    if (categoryId) {
+      queryParams = `?page=${page}&pageSize=${pageSize}`
+      if (keyword) {
+        queryParams += `&keyword=${encodeURIComponent(keyword)}`
+      }
+      url = `${API_URL}/Book/Filter/${categoryId}${queryParams}`
+    } else {
+      // Otherwise use the regular endpoint with query parameters
+      queryParams = `?page=${page}&pageSize=${pageSize}`
+      if (keyword) {
+        queryParams += `&keyword=${encodeURIComponent(keyword)}`
+      }
+      url = `${API_URL}/Book${queryParams}`
+    }
+
+    console.log("Fetching from URL:", url)
+
+    // Add a timeout to the fetch request
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+
+    clearTimeout(timeoutId)
+
+    // Log the response status and headers for debugging
+    console.log(`API Response Status: ${response.status} ${response.statusText}`)
+    console.log("API Response Headers:", Object.fromEntries([...response.headers.entries()]))
+
+    if (!response.ok) {
+      let errorText
+      try {
+        errorText = await response.text()
+        console.error(`API request failed with status ${response.status}:`, errorText)
+      } catch (e) {
+        errorText = `Could not read error response: ${e}`
+        console.error(`API request failed with status ${response.status}, could not read error:`, e)
+      }
+      return rejectWithValue(`API request failed with status ${response.status}: ${errorText}`)
+    }
+
+    // Try to parse the response as JSON
+    let data
+    try {
+      data = await response.json()
+      console.log("Fetch books response:", data)
+    } catch (e) {
+      console.error("Error parsing JSON response:", e)
+      return rejectWithValue(`Error parsing JSON response: ${e}`)
+    }
+
+    // Check if the API returned a success response
+    if (data && typeof data.isSuccess !== "undefined" && !data.isSuccess) {
+      console.error("API returned error:", data.exceptionMessage || data.message)
+      return rejectWithValue(data.exceptionMessage || data.message || "Failed to fetch books")
+    }
+
+    // Handle different response formats
+    let bookResponse
+    if (data && data.isSuccess && data.data) {
+      // If the response is wrapped in a data property
+      bookResponse = data.data
+    } else {
+      // If the response is the direct data
+      bookResponse = data
+    }
+
+    return bookResponse as BookResponse
+  } catch (error) {
+    // Check if it's an abort error (timeout)
+    if (error.name === "AbortError") {
+      console.error("Request timed out")
+      return rejectWithValue("Request timed out after 30 seconds")
+    }
+
+    console.error("Error fetching books:", error)
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to fetch books")
   }
-
-  if (params.category) {
-    filteredBooks = filteredBooks.filter((book) => book.category === params.category)
-  }
-
-  return filteredBooks
 })
 
-export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: string) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-
-  const book = mockBooks.find((book) => book.id === id)
-  if (!book) {
-    throw new Error("Book not found")
+// Fetch categories from API
+export const fetchCategories = createAsyncThunk("books/fetchCategories", async () => {
+  try {
+    const response = await fetchFromAPI("Category")
+    return response as Category[]
+  } catch (error) {
+    throw new Error("Failed to fetch categories")
   }
-
-  return book
 })
 
-export const createBook = createAsyncThunk("books/createBook", async (bookData: Book) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+// Fetch more books (for pagination)
+export const fetchMoreBooks = createAsyncThunk("books/fetchMoreBooks", async (params: BookParams = {}) => {
+  const { page = 1, pageSize = 20, keyword, categoryId } = params
 
-  // In a real app, this would make an API call
-  const newBook = {
-    ...bookData,
-    id: Date.now().toString(),
+  try {
+    let response
+
+    // If categoryId is provided, use the Filter endpoint
+    if (categoryId) {
+      let queryParams = `?page=${page}&pageSize=${pageSize}`
+
+      if (keyword) {
+        queryParams += `&keyword=${encodeURIComponent(keyword)}`
+      }
+
+      response = await fetchFromAPI(`Book/Filter/${categoryId}${queryParams}`)
+    } else {
+      // Otherwise use the regular endpoint with query parameters
+      let queryParams = `page=${page}&pageSize=${pageSize}`
+
+      if (keyword) {
+        queryParams += `&keyword=${encodeURIComponent(keyword)}`
+      }
+
+      response = await fetchFromAPI(`Book?${queryParams}`)
+    }
+
+    return response as BookResponse
+  } catch (error) {
+    throw new Error("Failed to fetch more books")
   }
-
-  return newBook
 })
 
+// Fetch a single book by ID
+export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: string, { rejectWithValue }) => {
+  try {
+    console.log(`Fetching book with ID: ${id}`)
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5083/api"
+
+    const response = await fetch(`${API_URL}/Book/${id}`)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`API request failed with status ${response.status}:`, errorText)
+      return rejectWithValue(`API request failed with status ${response.status}: ${errorText}`)
+    }
+
+    const data = await response.json()
+    console.log("Book API response:", data)
+
+    if (!data.isSuccess) {
+      console.error("API returned error:", data.exceptionMessage || data.message)
+      return rejectWithValue(data.exceptionMessage || data.message || "Failed to fetch book details")
+    }
+
+    // Extract the book details from the response
+    const bookDetail = data.data || data
+
+    if (!bookDetail || !bookDetail.book) {
+      console.error("Invalid response format:", bookDetail)
+      return rejectWithValue("Invalid response format from API")
+    }
+
+    return bookDetail
+  } catch (error) {
+    console.error("Error fetching book:", error)
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to fetch book")
+  }
+})
+
+// Update the createBook function in bookSlice.ts
+
+// Create a new book
+export const createBook = createAsyncThunk("books/createBook", async (bookData: any, { rejectWithValue }) => {
+  try {
+    console.log("Creating book with data:", bookData)
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5083/api"
+
+    const response = await fetch(`${API_URL}/Book`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bookData),
+    })
+
+    const responseData = await response.json()
+    console.log("Create book response:", responseData)
+
+    if (!response.ok) {
+      return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to create book")
+    }
+
+    if (!responseData.isSuccess) {
+      return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to create book")
+    }
+
+    // Return the created book data
+    return responseData.data || responseData
+  } catch (error) {
+    console.error("Error creating book:", error)
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to create book")
+  }
+})
+
+// Update the updateBook function similarly
 export const updateBook = createAsyncThunk(
   "books/updateBook",
-  async ({ id, bookData }: { id: string; bookData: Book }) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+  async ({ id, bookData }: { id: string; bookData: any }, { rejectWithValue }) => {
+    try {
+      console.log("Updating book with ID:", id, "Data:", bookData)
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5083/api"
 
-    // In a real app, this would make an API call
-    return {
-      ...bookData,
-      id,
+      const response = await fetch(`${API_URL}/Book/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookData),
+      })
+
+      const responseData = await response.json()
+      console.log("Update book response:", responseData)
+
+      if (!response.ok) {
+        return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to update book")
+      }
+
+      if (!responseData.isSuccess) {
+        return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to update book")
+      }
+
+      // Return the updated book data
+      return responseData.data || responseData
+    } catch (error) {
+      console.error("Error updating book:", error)
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to update book")
     }
   },
 )
 
+// Delete a book
 export const deleteBook = createAsyncThunk("books/deleteBook", async (id: string) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  try {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/Book/${id}`, {
+      method: "DELETE",
+    })
 
-  // In a real app, this would make an API call
-  return id
+    if (!response.ok) {
+      throw new Error("Failed to delete book")
+    }
+
+    return id
+  } catch (error) {
+    throw new Error("Failed to delete book")
+  }
 })
 
+// Update the initialState to include error
 const initialState: BookState = {
   books: [],
   currentBook: null,
+  bookDetail: null,
+  categories: [],
   loading: false,
+  categoriesLoading: false,
   error: null,
+  pagination: {
+    currentPage: 1,
+    pageCount: 1,
+    totalCount: 0,
+    hasMore: false,
+  },
 }
 
+// Update the extraReducers to handle errors properly
 const bookSlice = createSlice({
   name: "books",
   initialState,
-  reducers: {},
+  reducers: {
+    clearBookError: (state) => {
+      state.error = null
+    },
+  },
   extraReducers: (builder) => {
     builder
+      // Fetch books
       .addCase(fetchBooks.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(fetchBooks.fulfilled, (state, action: PayloadAction<Book[]>) => {
+      .addCase(fetchBooks.fulfilled, (state, action: PayloadAction<BookResponse>) => {
         state.loading = false
-        state.books = action.payload
+        state.books = action.payload.data
+        state.pagination = {
+          currentPage: action.payload.currentPage,
+          pageCount: action.payload.pageCount,
+          totalCount: action.payload.totalCount,
+          hasMore: action.payload.currentPage < action.payload.pageCount,
+        }
       })
       .addCase(fetchBooks.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Failed to fetch books"
       })
-      .addCase(fetchBookById.pending, (state) => {
+
+      // Fetch categories
+      .addCase(fetchCategories.pending, (state) => {
+        state.categoriesLoading = true
+      })
+      .addCase(fetchCategories.fulfilled, (state, action: PayloadAction<Category[]>) => {
+        state.categoriesLoading = false
+        state.categories = action.payload
+      })
+      .addCase(fetchCategories.rejected, (state) => {
+        state.categoriesLoading = false
+      })
+
+      // Fetch more books (pagination)
+      .addCase(fetchMoreBooks.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(fetchBookById.fulfilled, (state, action: PayloadAction<Book>) => {
+      .addCase(fetchMoreBooks.fulfilled, (state, action: PayloadAction<BookResponse>) => {
         state.loading = false
-        state.currentBook = action.payload
+        // Append new books to existing books
+        state.books = [...state.books, ...action.payload.data]
+        state.pagination = {
+          currentPage: action.payload.currentPage,
+          pageCount: action.payload.pageCount,
+          totalCount: action.payload.totalCount,
+          hasMore: action.payload.currentPage < action.payload.pageCount,
+        }
+      })
+      .addCase(fetchMoreBooks.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Failed to fetch more books"
+      })
+
+      // Fetch book by ID
+      .addCase(fetchBookById.pending, (state) => {
+        state.loading = true
+        state.error = null
+        state.bookDetail = null
+      })
+      .addCase(fetchBookById.fulfilled, (state, action: PayloadAction<BookDetail>) => {
+        state.loading = false
+        state.currentBook = action.payload.book
+        state.bookDetail = action.payload
+        state.error = null
       })
       .addCase(fetchBookById.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message || "Failed to fetch book"
+        state.error = (action.payload as string) || action.error.message || "Failed to fetch book"
+        console.error("Book fetch rejected:", action.payload || action.error.message)
       })
+
+      // Create book
       .addCase(createBook.fulfilled, (state, action: PayloadAction<Book>) => {
-        state.books.push(action.payload)
+        state.books.unshift(action.payload)
       })
+      .addCase(createBook.rejected, (state, action) => {
+        state.error = (action.payload as string) || action.error.message || "Failed to create book"
+      })
+
+      // Update book
       .addCase(updateBook.fulfilled, (state, action: PayloadAction<Book>) => {
-        const index = state.books.findIndex((book) => book.id === action.payload.id)
+        const index = state.books.findIndex((book) => book.bookId === action.payload.bookId)
         if (index !== -1) {
           state.books[index] = action.payload
         }
-        if (state.currentBook?.id === action.payload.id) {
+        if (state.currentBook?.bookId === action.payload.bookId) {
           state.currentBook = action.payload
         }
       })
+      .addCase(updateBook.rejected, (state, action) => {
+        state.error = (action.payload as string) || action.error.message || "Failed to update book"
+      })
+
+      // Delete book
       .addCase(deleteBook.fulfilled, (state, action: PayloadAction<string>) => {
-        state.books = state.books.filter((book) => book.id !== action.payload)
-        if (state.currentBook?.id === action.payload) {
+        state.books = state.books.filter((book) => book.bookId !== action.payload)
+        if (state.currentBook?.bookId === action.payload) {
           state.currentBook = null
         }
+      })
+      .addCase(deleteBook.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to delete book"
       })
   },
 })
 
+export const { clearBookError } = bookSlice.actions
 export default bookSlice.reducer

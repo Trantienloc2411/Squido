@@ -32,6 +32,7 @@ public class Program
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddScoped<IStatsService, StatService>();
+        builder.Services.AddScoped<IAuthorService, AuthorService>();
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
         builder.Services.AddCors(options =>

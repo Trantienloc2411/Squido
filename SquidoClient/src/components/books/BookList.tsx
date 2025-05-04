@@ -24,22 +24,30 @@ import {
   Flex,
   useDisclosure,
   useToast,
+  Button,
 } from "@chakra-ui/react"
 import { FiMoreVertical, FiEdit, FiTrash2, FiEye } from "react-icons/fi"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import type { AppDispatch } from "../../redux/store"
-import { deleteBook } from "../../redux/slices/bookSlice"
-import type { Book } from "../../types/book"
+import { deleteBook, fetchMoreBooks } from "../../redux/slices/bookSlice"
+import type { Book, BookParams } from "../../types/book"
 import BookFormModal from "./BookFormModal"
 import DeleteConfirmationModal from "../common/DeleteConfirmationModal"
 
 interface BookListProps {
   books: Book[]
   isLoading: boolean
+  pagination: {
+    currentPage: number
+    pageCount: number
+    totalCount: number
+    hasMore: boolean
+  }
+  searchParams: BookParams
 }
 
-const BookList: React.FC<BookListProps> = ({ books, isLoading }) => {
+const BookList: React.FC<BookListProps> = ({ books, isLoading, pagination, searchParams }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch<AppDispatch>()
   const toast = useToast()
@@ -53,6 +61,9 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading }) => {
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
   const [bookToDelete, setBookToDelete] = useState<Book | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // For loading more books
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const handleView = (id: string) => {
     navigate(`/books/${id}`)
@@ -73,7 +84,7 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading }) => {
 
     setIsDeleting(true)
     try {
-      await dispatch(deleteBook(bookToDelete.id))
+      await dispatch(deleteBook(bookToDelete.bookId))
       toast({
         title: "Book deleted",
         description: `"${bookToDelete.title}" has been deleted successfully.`,
@@ -95,7 +106,31 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading }) => {
     }
   }
 
-  if (isLoading) {
+  const handleLoadMore = async () => {
+    if (!pagination.hasMore) return
+
+    setLoadingMore(true)
+    try {
+      await dispatch(
+        fetchMoreBooks({
+          ...searchParams,
+          page: pagination.currentPage + 1,
+        }),
+      )
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load more books. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  if (isLoading && books.length === 0) {
     return (
       <Box bg={bgColor} rounded="lg" overflow="hidden" boxShadow="sm">
         <Skeleton height="40px" />
@@ -122,11 +157,11 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading }) => {
             </Thead>
             <Tbody>
               {books.map((book) => (
-                <Tr key={book.id}>
+                <Tr key={book.bookId}>
                   <Td>
                     <Flex align="center">
                       <Image
-                        src={book.coverImage || "/placeholder.svg?height=40&width=30&query=book"}
+                        src={book.imageUrls?.[0] || "/placeholder.svg?height=40&width=30&query=book"}
                         alt={book.title}
                         boxSize="40px"
                         objectFit="cover"
@@ -138,18 +173,18 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading }) => {
                           {book.title}
                         </Text>
                         <Text fontSize="xs" color="gray.500">
-                          ISBN: {book.isbn}
+                          ID: {book.bookId}
                         </Text>
                       </Box>
                     </Flex>
                   </Td>
-                  <Td>{book.author}</Td>
-                  <Td>{book.category}</Td>
+                  <Td>{book.authorName || "Unknown"}</Td>
+                  <Td>{book.categoryName}</Td>
                   <Td isNumeric>${book.price.toFixed(2)}</Td>
-                  <Td>{book.stock}</Td>
+                  <Td>{book.quantity}</Td>
                   <Td>
-                    <Badge colorScheme={book.stock > 0 ? "green" : "red"} variant="subtle" rounded="full" px={2}>
-                      {book.stock > 0 ? "In Stock" : "Out of Stock"}
+                    <Badge colorScheme={book.quantity > 0 ? "green" : "red"} variant="subtle" rounded="full" px={2}>
+                      {book.quantity > 0 ? "In Stock" : "Out of Stock"}
                     </Badge>
                   </Td>
                   <Td>
@@ -162,7 +197,7 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading }) => {
                         aria-label="Options"
                       />
                       <MenuList>
-                        <MenuItem icon={<FiEye />} onClick={() => handleView(book.id)}>
+                        <MenuItem icon={<FiEye />} onClick={() => handleView(book.bookId)}>
                           View Details
                         </MenuItem>
                         <MenuItem icon={<FiEdit />} onClick={() => handleEdit(book)}>
@@ -179,6 +214,20 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading }) => {
             </Tbody>
           </Table>
         </Box>
+
+        {pagination.hasMore && (
+          <Flex justify="center" p={4}>
+            <Button onClick={handleLoadMore} isLoading={loadingMore} loadingText="Loading more..." variant="outline">
+              Load More ({books.length} of {pagination.totalCount})
+            </Button>
+          </Flex>
+        )}
+
+        {!isLoading && books.length === 0 && (
+          <Box p={8} textAlign="center">
+            <Text>No books found. Try adjusting your search or filters.</Text>
+          </Box>
+        )}
       </Box>
 
       {/* Edit Modal */}
