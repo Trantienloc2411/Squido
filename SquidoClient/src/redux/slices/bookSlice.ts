@@ -29,7 +29,7 @@ export const fetchBooks = createAsyncThunk("books/fetchBooks", async (params: Bo
 
   try {
     console.log("Fetching books with params:", params)
-    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5083/api"
+    const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:5083/api"
     console.log("Using API URL:", API_URL)
 
     let url
@@ -165,11 +165,11 @@ export const fetchMoreBooks = createAsyncThunk("books/fetchMoreBooks", async (pa
   }
 })
 
-// Fetch a single book by ID
+// Fetch a single book by ID - FIXED VERSION
 export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: string, { rejectWithValue }) => {
   try {
     console.log(`Fetching book with ID: ${id}`)
-    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5083/api"
+    const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:5083/api"
 
     const response = await fetch(`${API_URL}/Book/${id}`)
 
@@ -182,19 +182,42 @@ export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: 
     const data = await response.json()
     console.log("Book API response:", data)
 
-    if (!data.isSuccess) {
-      console.error("API returned error:", data.exceptionMessage || data.message)
-      return rejectWithValue(data.exceptionMessage || data.message || "Failed to fetch book details")
+    // Handle different response formats
+    let bookDetail
+
+    // Check if the response has isSuccess property
+    if (data && typeof data.isSuccess !== "undefined") {
+      // If isSuccess is false, reject with error message
+      if (!data.isSuccess) {
+        console.error("API returned error:", data.exceptionMessage || data.message)
+        return rejectWithValue(data.exceptionMessage || data.message || "Failed to fetch book details")
+      }
+
+      // If isSuccess is true, extract data
+      bookDetail = data.data
+    } else {
+      // If the response doesn't have isSuccess property, use the data directly
+      bookDetail = data
     }
 
-    // Extract the book details from the response
-    const bookDetail = data.data || data
-
-    if (!bookDetail || !bookDetail.book) {
-      console.error("Invalid response format:", bookDetail)
-      return rejectWithValue("Invalid response format from API")
+    // If bookDetail is null or undefined, reject
+    if (!bookDetail) {
+      console.error("Invalid response format: bookDetail is null or undefined")
+      return rejectWithValue("Invalid response format: bookDetail is null or undefined")
     }
 
+    // If bookDetail doesn't have a book property, check if it is the book itself
+    if (!bookDetail.book) {
+      // If the response has properties that look like a book, wrap it
+      if (bookDetail.bookId || bookDetail.title) {
+        bookDetail = { book: bookDetail }
+      } else {
+        console.error("Invalid response format: no book data found", bookDetail)
+        return rejectWithValue("Invalid response format: no book data found")
+      }
+    }
+
+    console.log("import.metaed book detail:", bookDetail)
     return bookDetail
   } catch (error) {
     console.error("Error fetching book:", error)
@@ -208,7 +231,7 @@ export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: 
 export const createBook = createAsyncThunk("books/createBook", async (bookData: any, { rejectWithValue }) => {
   try {
     console.log("Creating book with data:", bookData)
-    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5083/api"
+    const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:5083/api"
 
     const response = await fetch(`${API_URL}/Book`, {
       method: "POST",
@@ -225,7 +248,7 @@ export const createBook = createAsyncThunk("books/createBook", async (bookData: 
       return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to create book")
     }
 
-    if (!responseData.isSuccess) {
+    if (responseData && typeof responseData.isSuccess !== "undefined" && !responseData.isSuccess) {
       return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to create book")
     }
 
@@ -243,7 +266,7 @@ export const updateBook = createAsyncThunk(
   async ({ id, bookData }: { id: string; bookData: any }, { rejectWithValue }) => {
     try {
       console.log("Updating book with ID:", id, "Data:", bookData)
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5083/api"
+      const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:5083/api"
 
       const response = await fetch(`${API_URL}/Book/${id}`, {
         method: "PUT",
@@ -260,7 +283,7 @@ export const updateBook = createAsyncThunk(
         return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to update book")
       }
 
-      if (!responseData.isSuccess) {
+      if (responseData && typeof responseData.isSuccess !== "undefined" && !responseData.isSuccess) {
         return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to update book")
       }
 
@@ -276,7 +299,7 @@ export const updateBook = createAsyncThunk(
 // Delete a book
 export const deleteBook = createAsyncThunk("books/deleteBook", async (id: string) => {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/Book/${id}`, {
+    const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/Book/${id}`, {
       method: "DELETE",
     })
 
