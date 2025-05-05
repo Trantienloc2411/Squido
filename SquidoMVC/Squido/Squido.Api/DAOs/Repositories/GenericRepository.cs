@@ -194,8 +194,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     }
     public Task UpdateAsync(T entity)
     {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         // Get the primary key value (assumes key property is named "Id")
         var keyProperty = typeof(T).GetProperty("Id");
@@ -225,5 +224,10 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         return Task.CompletedTask;
     }
 
+    public Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
 
+        return _dbSet.CountAsync(predicate);
+    }
 }

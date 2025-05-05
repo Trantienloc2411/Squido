@@ -67,6 +67,7 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
             var listBookRelated = bookRelated.ToList();
             var bookViewModel = new BookViewModel();
             var categoryViewModel = new CategoryViewModel();
+            
             var bookResult = mapper.Map(book, bookViewModel);
             var categoryResult = mapper.Map(book.Category, categoryViewModel);
             var details = new ViewBookDetailViewModel
@@ -74,7 +75,6 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
                 Book = bookResult,
                 Category = categoryResult,
                 Bio = book.Author.Bio,
-                ImageUrl = "",
                 RatingValueAverage = 4.5,
                 BookDescription = book.Description,
                 BookRelated = listBookRelated,
@@ -141,6 +141,44 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
         }
     }
 
+
+    [HttpPost("api/Book")]
+    public async Task<IActionResult> CreateBook([FromBody] CreateBookViewModel bookViewModel)
+    {
+        try
+        {
+            var result = await bookService.CreateBook(bookViewModel);
+            if (result.IsSuccess)
+            {
+                return CreatedAtAction(nameof(GetBook), new { id = result!.Data!.Id }, result);
+            }
+            return BadRequest(result);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    [HttpPut("api/Book/{id}")]
+    public async Task<IActionResult> UpdateBook([FromRoute(Name = "id")] string bookId, [FromBody] CreateBookViewModel bookViewModel)
+    {
+        try
+        {
+            var result = await bookService.UpdateBook(bookId, bookViewModel);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 
     
 

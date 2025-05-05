@@ -1,10 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squido.Mvc", "Squido.Mvc\Squido.Mvc.csproj", "{807DF2D7-0BA1-4650-A791-26DDDFC9C605}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squido.Api", "Squido.Api\Squido.Api.csproj", "{540008E5-4E07-4AE4-8236-D9831EDEB911}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedViewModal", "SharedViewModal\SharedViewModal.csproj", "{51C9FF8F-5DA6-49D2-BFE4-CC67CF83B292}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squido.Test", "Squido.Test\Squido.Test.csproj", "{861F1AE8-6EEF-4ADE-A97F-AE22CF8F070A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +27,9 @@ Global
 		{51C9FF8F-5DA6-49D2-BFE4-CC67CF83B292}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51C9FF8F-5DA6-49D2-BFE4-CC67CF83B292}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51C9FF8F-5DA6-49D2-BFE4-CC67CF83B292}.Release|Any CPU.Build.0 = Release|Any CPU
+		{861F1AE8-6EEF-4ADE-A97F-AE22CF8F070A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{861F1AE8-6EEF-4ADE-A97F-AE22CF8F070A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{861F1AE8-6EEF-4ADE-A97F-AE22CF8F070A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{861F1AE8-6EEF-4ADE-A97F-AE22CF8F070A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

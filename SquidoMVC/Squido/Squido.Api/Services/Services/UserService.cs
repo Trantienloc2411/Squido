@@ -19,7 +19,7 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
         {
             var result = new UserViewModel();
             var user = await uoW.UserRepository.GetSingleWithIncludeAsync
-                (c => email == c.Email, c => c.Role);
+                (c => email == c.Email && c.IsDeleted == false, c => c.Role);
             if (BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
             {
                 result = mapper.Map<UserViewModel>(user);
@@ -62,7 +62,7 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
 
     private bool IsUserExists(string? email)
     {
-        return uoW.UserRepository.GetAll().Any(c => string.Equals(c.Email, email, StringComparison.CurrentCultureIgnoreCase));
+        return uoW.UserRepository.GetAll().Where(c => c.IsDeleted == false).Any(c => string.Equals(c.Email, email, StringComparison.CurrentCultureIgnoreCase));
     }
 
     private static string Hashing(string password)
@@ -104,7 +104,7 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
         {
             if (IsUserExists(userId))
             {
-                var userOld = await uoW.UserRepository.GetSingleWithIncludeAsync(c => c.Id == userId, c => c.Role);
+                var userOld = await uoW.UserRepository.GetSingleWithIncludeAsync(c => c.Id == userId && c.IsDeleted == false, c => c.Role);
                 int role = userOld.RoleId;
                 GenderEnum gender = userOld.Gender;
                 // Map updated fields into the existing entity
@@ -134,7 +134,7 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
     {
         try
         {
-            return uoW.UserRepository.GetAll().Any(c => c.Id == userId);
+            return uoW.UserRepository.GetAll().Where(c => c.IsDeleted == false).Any(c => c.Id == userId);
         }
         catch (System.Exception ex)
         {

@@ -31,7 +31,19 @@ public class Program
         builder.Services.AddScoped<IBookService, BookService>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
+        builder.Services.AddScoped<IStatsService, StatService>();
+        builder.Services.AddScoped<IAuthorService, AuthorService>();
         builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+        builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", policy =>
+    {
+        policy.AllowAnyOrigin()  // Allow requests from any origin
+              .AllowAnyHeader()  // Allow any header
+              .AllowAnyMethod(); // Allow any HTTP method (GET, POST, etc.)
+    });
+});
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddControllers().AddJsonOptions(option =>
@@ -63,6 +75,7 @@ public class Program
 
         builder.Services.AddAuthorization();
 
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -85,6 +98,7 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthentication();
+        app.UseCors("AllowAllOrigins");
         app.UseAuthorization();
         app.MapControllers();
 

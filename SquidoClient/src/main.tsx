@@ -1,19 +1,21 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
+import { Provider } from "react-redux"
 import { BrowserRouter } from "react-router-dom"
+import { ChakraProvider } from "@chakra-ui/react"
 import App from "./App"
-import { ThemeProvider } from "./components/theme-provider"
-import { Providers } from "./redux/provider"
-import "./index.css"
+import { store } from "./redux/store"
+import theme from "./theme"
+import "./styles/index.scss"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider defaultTheme="light" storageKey="edox-theme">
-        <Providers>
+    <Provider store={store}>
+      <BrowserRouter>
+        <ChakraProvider theme={theme}>
           <App />
-        </Providers>
-      </ThemeProvider>
-    </BrowserRouter>
+        </ChakraProvider>
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
 )

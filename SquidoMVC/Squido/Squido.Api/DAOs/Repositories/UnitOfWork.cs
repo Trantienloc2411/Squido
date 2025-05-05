@@ -10,7 +10,6 @@ public class UnitOfWork(SquidoDbContext context) : IUnitOfWork
 {
     private readonly SquidoDbContext _context = context;
     private GenericRepository<Book>? _bookRepository;
-    private GenericRepository<ImageBook>? _imageBookRepository;
     private GenericRepository<Role>? _roleRepository;
     private GenericRepository<User>? _userRepository;
     private GenericRepository<Category>? _categoryRepository;
@@ -76,13 +75,6 @@ public class UnitOfWork(SquidoDbContext context) : IUnitOfWork
         }
     }
 
-    public IGenericRepository<ImageBook> ImageBookRepository
-    {
-        get
-        {
-            return _imageBookRepository ??= new GenericRepository<ImageBook>(_context);
-        }
-    }
 
     public IGenericRepository<Author> AuthorRepository
     {
