@@ -7,7 +7,7 @@ public class Role
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int RoleId { get; set; }
+    public int Id { get; set; }
         
     public string? RoleName { get; set; } // Note: RoleName as integer seems unusual
         

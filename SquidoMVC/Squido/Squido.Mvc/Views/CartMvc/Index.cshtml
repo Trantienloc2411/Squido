@@ -78,7 +78,7 @@
                                                         <span>@item.QuantityCart</span>
                                                         <button class="btn btn-sm btn-link" data-bs-toggle="modal"
                                                                 data-bs-target="#updateQuantityModal"
-                                                                data-id="@item.BookId"
+                                                                data-id="@item.Id"
                                                                 data-title="@item.Title" data-author="@item.AuthorName"
                                                                 data-image="@item.ImageUrl" data-price="@item.Price"
                                                                 data-quantity="@item.QuantityCart">
@@ -90,10 +90,10 @@
                                                 <td class="text-center">
                                                     <form asp-action="RemoveFromCart" asp-controller="Cart"
                                                           method="post">
-                                                        <input type="hidden" name="bookId" value="@item.BookId"/>
+                                                        <input type="hidden" name="bookId" value="@item.Id"/>
                                                         <button type="button" class="btn btn-sm btn-danger"
                                                                 data-bs-toggle="modal" data-bs-target="#deleteItemModal"
-                                                                data-id="@item.BookId" data-title="@item.Title"
+                                                                data-id="@item.Id" data-title="@item.Title"
                                                                 data-author="@item.AuthorName"
                                                                 data-image="@item.ImageUrl">
                                                             <i class="fas fa-trash-alt"></i>

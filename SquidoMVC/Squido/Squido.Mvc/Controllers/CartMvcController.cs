@@ -14,14 +14,14 @@ public class CartMvcController(IHttpClientFactory clientFactory) : BaseControlle
         {
             var cart = HttpContext.Session.GetObject<List<CartItem>>("Cart") ?? new List<CartItem>();
 
-            var existingItem = cart.FirstOrDefault(c => string.Equals(c.BookId, bookId, StringComparison.OrdinalIgnoreCase));
+            var existingItem = cart.FirstOrDefault(c => string.Equals(c.Id, bookId, StringComparison.OrdinalIgnoreCase));
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
             }
             else
             {
-                cart.Add(new CartItem() { BookId = bookId, Quantity = quantity });
+                cart.Add(new CartItem() { Id = bookId, Quantity = quantity });
             }
             HttpContext.Session.SetObject("Cart", cart);
             return RedirectToAction("LoadCartItem", "CartMvc");
@@ -49,13 +49,13 @@ public class CartMvcController(IHttpClientFactory clientFactory) : BaseControlle
 
                 //List after filtering from cart
                 var result = bookList!.Where(b
-                    => cart.Any(c => c.BookId == b.BookId)).ToList();
+                    => cart.Any(c => c.Id == b.Id)).ToList();
 
                 var cartItems = result.Select(item => new CartItemViewModel
                 {
-                    BookId = item.BookId,
+                    Id = item.Id,
                     Price = item.Price,
-                    QuantityCart = cart.FirstOrDefault(c => c.BookId == item.BookId)?.Quantity ?? 0,
+                    QuantityCart = cart.FirstOrDefault(c => c.Id == item.Id)?.Quantity ?? 0,
                     QuantityOnStore = item.Quantity,
                     Title = item.Title,
                     AuthorName = item.AuthorName
@@ -82,7 +82,7 @@ public class CartMvcController(IHttpClientFactory clientFactory) : BaseControlle
         {
             var cart = HttpContext.Session.GetObject<List<CartItem>>("Cart") ?? new List<CartItem>();
 
-            var existingItem = cart.FirstOrDefault(c => string.Equals(c.BookId, bookId, StringComparison.OrdinalIgnoreCase));
+            var existingItem = cart.FirstOrDefault(c => string.Equals(c.Id, bookId, StringComparison.OrdinalIgnoreCase));
             if (existingItem != null)
             {
                 existingItem.Quantity = quantity;
@@ -105,7 +105,7 @@ public class CartMvcController(IHttpClientFactory clientFactory) : BaseControlle
         {
             var cart = HttpContext.Session.GetObject<List<CartItem>>("Cart") ?? new List<CartItem>();
 
-            cart.RemoveAll(c => string.Equals(c.BookId, bookId, StringComparison.OrdinalIgnoreCase));
+            cart.RemoveAll(c => string.Equals(c.Id, bookId, StringComparison.OrdinalIgnoreCase));
 
             HttpContext.Session.SetObject("Cart", cart);
 

@@ -18,7 +18,7 @@ namespace WebApplication1.Models
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
-        public DbSet<ImageBook> ImageBooks { get; set; }
+        
         public DbSet<Author> Authors { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
@@ -32,7 +32,6 @@ namespace WebApplication1.Models
             modelBuilder.Entity<Rating>().ToTable("Ratings");
             modelBuilder.Entity<Order>().ToTable("Orders");
             modelBuilder.Entity<OrderItem>().ToTable("OrderItems");
-            modelBuilder.Entity<ImageBook>().ToTable("ImageBook");
             modelBuilder.Entity<Author>().ToTable("Authors");
             modelBuilder.Entity<RefreshToken>().ToTable("RefreshTokens");
 
@@ -64,11 +63,7 @@ namespace WebApplication1.Models
                 .WithMany(b => b.OrderItems)
                 .HasForeignKey(o => o.BookId)
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<ImageBook>()
-                .HasOne(b => b.Book)
-                .WithMany(c => c.ImageBooks)
-                .HasForeignKey(b => b.BookId)
-                .OnDelete(DeleteBehavior.Restrict);
+            
             modelBuilder.Entity<Rating>()
                 .HasOne(r => r.OrderItem)
                 .WithMany(o => o.Ratings)

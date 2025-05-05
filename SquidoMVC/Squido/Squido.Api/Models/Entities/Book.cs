@@ -9,7 +9,7 @@ namespace WebApplication1.Models.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string BookId { get; set; }
+        public string Id { get; set; }
         
         public string Title { get; set; }
         
@@ -30,6 +30,8 @@ namespace WebApplication1.Models.Entities
         public DateTime CreatedDate { get; set; }
         
         public DateTime? UpdatedDate { get; set; }
+
+        public string? ImageUrl { get; set; }
     
         public bool IsDeleted { get; set; }
         
@@ -38,7 +40,7 @@ namespace WebApplication1.Models.Entities
         
         // Navigation properties
         public virtual ICollection<OrderItem> OrderItems { get; set; }
-        public virtual ICollection<ImageBook> ImageBooks { get; set; }
+        
         public virtual Author Author { get; set; }
     }
 }

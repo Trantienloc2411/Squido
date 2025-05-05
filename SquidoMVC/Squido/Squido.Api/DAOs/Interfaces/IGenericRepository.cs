@@ -35,4 +35,6 @@ public interface IGenericRepository<T> where T : class
     Task<ICollection<T>> GetAllWithIncludeAsync(Expression<Func<T, bool>> predicate,
         params Expression<Func<T, object>>[] includeProperties);
     void AddRange(ICollection<T> entities);
+
+    Task<int> CountAsync(Expression<Func<T, bool>> predicate);
 }

@@ -1,29 +1,38 @@
+import type React from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
-import { Toaster } from "./components/ui/toaster"
-import DashboardLayout from "./layouts/DashboardLayout"
+import { Box, useColorModeValue } from "@chakra-ui/react"
+import Layout from "./components/layout/Layout"
 import Dashboard from "./pages/Dashboard"
-import Products from "./pages/Products"
-import NewProduct from "./pages/NewProduct"
-import EditProduct from "./pages/EditProduct"
-import Categories from "./pages/Categories"
-import Customers from "./pages/Customers"
+import BookManagement from "./pages/BookManagement"
+import UserManagement from "./pages/UserManagement"
+import OrderManagement from "./pages/OrderManagement"
+import NotFound from "./pages/NotFound"
+import ProtectedRoute from "./components/auth/ProtectedRoute"
 
-function App() {
+const App: React.FC = () => {
+  const bgColor = useColorModeValue("gray.50", "gray.900")
+
   return (
-    <>
+    <Box bg={bgColor} minH="100vh">
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/" element={<DashboardLayout />}>
+        <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="products" element={<Products />} />
-          <Route path="products/new" element={<NewProduct />} />
-          <Route path="products/:id" element={<EditProduct />} />
-          <Route path="categories" element={<Categories />} />
-          <Route path="customers" element={<Customers />} />
+          <Route path="books/*" element={<BookManagement />} />
+          <Route path="users/*" element={<UserManagement />} />
+          <Route path="orders/*" element={<OrderManagement />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
-      <Toaster />
-    </>
+    </Box>
   )
 }
 

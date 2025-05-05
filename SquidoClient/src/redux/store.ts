@@ -1,16 +1,24 @@
 import { configureStore } from "@reduxjs/toolkit"
-import categoriesReducer from "./slices/categoriesSlice"
-import productsReducer from "./slices/productsSlice"
-import customersReducer from "./slices/customersSlice"
-import statsReducer from "./slices/statsSlice"
+import authReducer from "./slices/authSlice"
+import bookReducer from "./slices/bookSlice"
+import userReducer from "./slices/userSlice"
+import orderReducer from "./slices/orderSlice"
+import dashboardReducer from "./slices/dashboardSlice"
+import authorReducer from "./slices/authorSlice"
 
 export const store = configureStore({
   reducer: {
-    categories: categoriesReducer,
-    products: productsReducer,
-    customers: customersReducer,
-    stats: statsReducer,
+    auth: authReducer,
+    books: bookReducer,
+    users: userReducer,
+    orders: orderReducer,
+    dashboard: dashboardReducer,
+    authors: authorReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 })
 
 export type RootState = ReturnType<typeof store.getState>
