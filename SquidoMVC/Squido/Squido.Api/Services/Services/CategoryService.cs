@@ -13,4 +13,14 @@ public class CategoryService(IUnitOfWork unitOfWork, IMapper mapper) : ICategory
         var categories = await unitOfWork.CategoryRepository.GetAllWithIncludeAsync(c => c.IsDeleted == false);
         return mapper.Map<IEnumerable<CategoryViewModel>>(categories);
     }
+
+    public Task<CategoryViewModel> GetCategoryById(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CreateCategory(CategoryViewModel model)
+    {
+        throw new NotImplementedException();
+    }
 }

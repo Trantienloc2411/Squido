@@ -150,7 +150,26 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
             var result = await bookService.CreateBook(bookViewModel);
             if (result.IsSuccess)
             {
-                return CreatedAtAction(nameof(GetBook), new { id = result!.Data!.BookId }, result);
+                return CreatedAtAction(nameof(GetBook), new { id = result!.Data!.Id }, result);
+            }
+            return BadRequest(result);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    [HttpPut("api/Book/{id}")]
+    public async Task<IActionResult> UpdateBook([FromRoute(Name = "id")] string bookId, [FromBody] CreateBookViewModel bookViewModel)
+    {
+        try
+        {
+            var result = await bookService.UpdateBook(bookId, bookViewModel);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
             }
             return BadRequest(result);
         }

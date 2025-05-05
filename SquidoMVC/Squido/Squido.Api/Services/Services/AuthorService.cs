@@ -8,19 +8,74 @@ namespace WebApplication1.Services.Services;
 
 public class AuthorService(IUnitOfWork unitOfWork, IMapper mapper) : IAuthorService
 {
-    public Task<ResponseMessage<AuthorViewModel>> CreateAuthor(Author author)
+    public async Task<ResponseMessage<AuthorViewModel>> CreateAuthor(Author author)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await unitOfWork.AuthorRepository.AddAsync(author);
+            unitOfWork.Save();
+            return new ResponseMessage<AuthorViewModel>()
+            {
+                IsSuccess = true,
+                Data = mapper.Map<AuthorViewModel>(author),
+
+            };
+        }   
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public Task<ResponseMessage<AuthorViewModel>> DeleteAuthor(string id)
+    public async Task<ResponseMessage<AuthorViewModel>> DeleteAuthor(string id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var author = await
+                unitOfWork.AuthorRepository.GetSingleWithIncludeAsync(t => t.Id.ToString().ToLower() == id.ToLower());
+            if(author != null) author.IsDeleted = true;
+            unitOfWork.Save();
+            return new ResponseMessage<AuthorViewModel>()
+            {
+                IsSuccess = true,
+            };
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<AuthorViewModel>()
+            {
+                IsSuccess = false,
+                Message = e.Message,
+                Data = null,
+            };
+        }
     }
 
-    public Task<AuthorViewModel> GetAuthorById(string id)
+    public async Task<ResponseMessage<AuthorViewModel>> GetAuthorById(string id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var author = await unitOfWork.AuthorRepository.GetSingleWithIncludeAsync(t => t.Id.ToString().ToLower() == id.ToLower());
+            if (author != null)
+                return new ResponseMessage<AuthorViewModel>()
+                {
+                    IsSuccess = true,
+                    Data = mapper.Map<AuthorViewModel>(author),
+                };
+            else
+                return new ResponseMessage<AuthorViewModel>()
+                {
+                    IsSuccess = false,
+                    Data = null,
+
+                };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public async Task<List<AuthorViewModel>> GetAuthors(string? keyword = null, int currentPage = 1, int pageSize = 10)
@@ -49,8 +104,41 @@ public class AuthorService(IUnitOfWork unitOfWork, IMapper mapper) : IAuthorServ
     }
 
 
-    public Task<ResponseMessage<AuthorViewModel>> UpdateAuthor(string id, Author author)
+    public async Task<ResponseMessage<AuthorViewModel>> UpdateAuthor(string id, Author author)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var authorOld = await unitOfWork.AuthorRepository.GetSingleWithIncludeAsync(t => t.Id.ToString().ToLower() == id.ToLower());
+            if (authorOld == null)
+            {
+                return new ResponseMessage<AuthorViewModel>
+                {
+                    IsSuccess = false,
+                    Message = "Author not found"
+                };
+            }
+
+            var idAuthor = authorOld.Id;
+            var newAuthor = mapper.Map(author, authorOld); // map new data onto old entity
+            newAuthor.Id = idAuthor;
+            await unitOfWork.AuthorRepository.UpdateAsync(newAuthor);
+            unitOfWork.Save();
+
+            return new ResponseMessage<AuthorViewModel>
+            {
+                IsSuccess = true,
+                Data = mapper.Map<AuthorViewModel>(newAuthor),
+                Message = "Author updated successfully"
+            };
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<AuthorViewModel>
+            {
+                IsSuccess = false,
+                Message = e.Message
+            };
+        }
     }
+
 }

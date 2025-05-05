@@ -14,7 +14,7 @@ namespace WebApplication1.Services.Interfaces
         
         Task<ResponseMessage<BookViewModel>> CreateBook(CreateBookViewModel bookViewModel);
 
-        Task<ResponseMessage<BookViewModel>> UpdateBook(string id, BookViewModel bookViewModel);
+        Task<ResponseMessage<BookViewModel>> UpdateBook(string id, CreateBookViewModel bookViewModel);
 
         Task<ResponseMessage<BookViewModel>> DeleteBook(string id);
         

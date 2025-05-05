@@ -13,8 +13,8 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         var bookList = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
             p => p.IsDeleted == false,
             p => p.Category,
-            p => p.Author,
-            p => p.ImageBooks);
+            p => p.Author
+            );
 
         if (!string.IsNullOrWhiteSpace(keyword))
         {
@@ -42,8 +42,8 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         try
         {
             
-            var book = await unitOfWork.BookRepository.GetSingleWithIncludeAsync(t => t.BookId.ToLower() == id.ToLower(), t => t.Category,
-                t => t.Author, t => t.ImageBooks);
+            var book = await unitOfWork.BookRepository.GetSingleWithIncludeAsync(t => t.Id.ToLower() == id.ToLower(), t => t.Category,
+                t => t.Author);
             return book;
         }
         catch (Exception e)
@@ -67,14 +67,14 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
             var booksList = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
                 b => b.AuthorId == parsedAuthorId && b.IsDeleted == false,
                 b => b.Author,
-                b => b.Category,
-                b => b.ImageBooks
+                b => b.Category
+                
             );
 
             // If there's a currentBook, exclude it
             if (!string.IsNullOrEmpty(currentBook))
             {
-                var toExclude = booksList.FirstOrDefault(c => c.BookId == currentBook);
+                var toExclude = booksList.FirstOrDefault(c => c.Id == currentBook);
                 if (toExclude != null)
                 {
                     booksList = booksList.Except(new[] { toExclude }).ToList();
@@ -99,8 +99,8 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
             var books = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
                 c => c.IsDeleted == false,
                 c => c.Category,
-                c => c.Author,
-                c => c.ImageBooks);
+                c => c.Author
+               );
             var result = books.Where(
                 b => categoryIds.Contains(b.CategoryId)).ToList();
             var bookReturn = mapper.Map<ICollection<BookViewModel>>(result);
@@ -118,22 +118,12 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         try
         {
             var book = mapper.Map<Book>(bookViewModel);
-            book.BookId = GenerateBookId();
+            book.Id = GenerateBookId();
             book.CreatedDate = DateTime.Now;
             book.IsDeleted = false;
             await unitOfWork.BookRepository.AddAsync(book);
 
-            List<ImageBook> imageBooks = new List<ImageBook>();
-            foreach (var image in bookViewModel.ImageUrls)
-            {
-                var imageBook = new ImageBook
-                {
-                    BookId = book.BookId,
-                    UrlImage = image,
-                };
-                imageBooks.Add(imageBook);
-            }
-            unitOfWork.ImageBookRepository.AddRange(imageBooks);
+            
             unitOfWork.Save();
             var result = mapper.Map<BookViewModel>(book);
             return new ResponseMessage<BookViewModel>
@@ -155,9 +145,36 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         }
     }
 
-    public Task<ResponseMessage<BookViewModel>> UpdateBook(string id, BookViewModel bookViewModel)
+    public async Task<ResponseMessage<BookViewModel>> UpdateBook(string id, CreateBookViewModel bookViewModel)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var book = await unitOfWork.BookRepository.GetSingleWithIncludeAsync(b => b.Id.ToLower() == id.ToLower(), b => b.Category, b => b.Author);
+            if (book == null)
+            {
+                return new ResponseMessage<BookViewModel>()
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Book Not Found"
+                };
+            }
+            mapper.Map(bookViewModel, book);
+            await unitOfWork.BookRepository.UpdateAsync(book);
+            unitOfWork.Save();
+
+            var result = mapper.Map<BookViewModel>(book);
+            return new ResponseMessage<BookViewModel>
+            {
+                IsSuccess = true,
+                Message = "Update Book Success",
+                Data = result
+            };
+        }
+        catch (System.Exception ex)
+        {
+            throw ex;   
+        }
     }
 
     public Task<ResponseMessage<BookViewModel>> DeleteBook(string id)

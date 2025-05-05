@@ -174,9 +174,7 @@ const BookDetail: React.FC = () => {
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
           <Box>
             <Image
-              src={
-                imageUrl || (book.imageUrls && book.imageUrls[0]) || "/placeholder.svg?height=400&width=300&query=book"
-              }
+              src={imageUrl || book.imageUrl || "/placeholder.svg?height=400&width=300&query=book"}
               alt={book.title || "Book Cover"}
               maxH="400px"
               objectFit="contain"
@@ -230,7 +228,7 @@ const BookDetail: React.FC = () => {
             <SimpleGrid columns={2} spacing={4}>
               <Box>
                 <Text fontWeight="bold">Book ID:</Text>
-                <Text>{book.bookId || "N/A"}</Text>
+                <Text>{book.id || "N/A"}</Text> {/* Changed from bookId to id */}
               </Box>
 
               <Box>

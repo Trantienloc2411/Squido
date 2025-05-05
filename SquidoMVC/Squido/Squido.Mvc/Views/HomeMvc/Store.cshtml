@@ -39,9 +39,9 @@
                             {
                                 <div class="form-check">
                                     <input class="form-check-input category-checkbox" type="checkbox" name="categories"
-                                        value="@item.CategoryId" id="cat-@item.CategoryId">
-                                    <label class="form-check-label" for="@item.CategoryId">
-                                        @item.Name - @item.CategoryId
+                                        value="@item.Id" id="cat-@item.Id">
+                                    <label class="form-check-label" for="@item.Id">
+                                        @item.Name - @item.Id
                                     </label>
                                 </div>
                             }
@@ -141,7 +141,7 @@
                             <div class="book-card">
 
                                 <a class="text-decoration-none text-black" asp-controller="BookMvc" asp-action="Details"
-                                    asp-route-id="@item.BookId">
+                                    asp-route-id="@item.Id">
                                     <div class="book-image">
                                         <img src="~/images/1_.jpg" alt="@item.Title" class="img-fluid">
                                     </div>

@@ -11,7 +11,6 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<OrderItem> OrderItemRepository { get; }
     IGenericRepository<Rating> RatingRepository { get; }
     IGenericRepository<Role> RoleRepository { get; }
-    IGenericRepository<ImageBook> ImageBookRepository { get; }
     IGenericRepository<Author> AuthorRepository { get; }
     IGenericRepository<RefreshToken> RefreshTokenRepository {get;}
     void Save();

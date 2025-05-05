@@ -38,12 +38,12 @@ public class AuthController : ControllerBase
                 {
                     return Unauthorized("This account was deleted or not authorized.");
                 }
-                else if (user.Role!.RoleId != 1 && user.Role.RoleId != 2)
+                else if (user.Role!.Id != 1 && user.Role.Id != 2)
                 {
                     return Unauthorized("You are not authorized to login.");
                 }
 
-                var roles = user.Role.RoleId;
+                var roles = user.Role.Id;
 
                 // Generate tokens
                 string accessToken = jwtService.GenerateToken(user.Id!.ToString(), user!.Username!, roles);
