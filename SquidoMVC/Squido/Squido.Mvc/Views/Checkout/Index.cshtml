@@ -117,7 +117,7 @@
                     </div>
                 </div>
 
-                <form method="post">
+                <form method="post" asp-action="CreateOrder" asp-controller="CheckoutMvc">
 
 
                     <!-- Payment Method -->
@@ -216,7 +216,7 @@
                                 <label for="orderNotes" class="form-label">Add any special instructions or notes about
                                     your
                                     order</label>
-                                <textarea class="form-control" id="orderNotes" rows="3"
+                                <textarea class="form-control" id="orderNotes" rows="3" name="OrderViewModel.OrderNote" asp-for="OrderViewModel.OrderNote"
                                     placeholder="e.g., Leave package at the door, gift wrapping instructions, etc."></textarea>
                             </div>
                         </div>
@@ -226,9 +226,19 @@
                         <a href="cart.html" class="btn btn-outline-primary">
                             <i class="fas fa-arrow-left me-2"></i> Back to Cart
                         </a>
-                        <button type="submit" class="btn btn-primary">
-                            Place Order <i class="fas fa-check ms-2"></i>
-                        </button>
+                        @if(!haveAddress) 
+                        {
+                            <button type="button" class="btn btn-primary" disabled>
+                                Place Order <i class="fas fa-check ms-2"></i>
+                            </button>
+                        }
+                        else 
+                        {
+                            <button type="submit" class="btn btn-primary" >
+                                Place Order <i class="fas fa-check ms-2"></i>
+                            </button>
+                        }
+                        
                     </div>
                 </form>
             </div>

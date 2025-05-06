@@ -21,8 +21,15 @@ public class Program
         // Add services to the container.
         builder.Services.AddAuthorization();
         builder.Services.AddDbContext<SquidoDbContext>(
-            options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-        builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.EnableSensitiveDataLogging();
+                options.EnableDetailedErrors();
+            });
+   
+
+    builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.AddScoped<JwtService>();
@@ -33,6 +40,7 @@ public class Program
         builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddScoped<IStatsService, StatService>();
         builder.Services.AddScoped<IAuthorService, AuthorService>();
+        builder.Services.AddScoped<IRatingService, RatingService>();
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
         builder.Services.AddCors(options =>

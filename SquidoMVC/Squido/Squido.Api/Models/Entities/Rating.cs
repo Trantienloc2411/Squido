@@ -6,19 +6,20 @@ namespace   WebApplication1.Models.Entities;
 public class Rating
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; set; }
-        
-    public Guid OrderItemId { get; set; }
+    public string Id { get; set; }
         
     public Guid CustomerId { get; set; }
+    
+    [ForeignKey("Book")]
+    public string BookId { get; set; }
         
     public int RatingValue { get; set; }
+    [MaxLength(150)]
+    public string Comment { get; set; }
         
     public DateTime CreatedDate { get; set; }
-        
-    [ForeignKey("OrderItemId")]
-    public OrderItem OrderItem { get; set; }
+    
+    public virtual Book? Book { get; set; }
         
     [ForeignKey("CustomerId")]
     public User Customer { get; set; }

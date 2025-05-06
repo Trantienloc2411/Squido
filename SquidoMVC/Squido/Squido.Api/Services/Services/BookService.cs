@@ -11,7 +11,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
     public async Task<ICollection<BookViewModel>> GetBooks(string? keyword = null)
     {
         var bookList = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
-            p => p.IsDeleted == false,
+            p => p.IsDeleted == false && p.Category.IsDeleted == false && p.Author.IsDeleted == false,
             p => p.Category,
             p => p.Author
             );
@@ -42,8 +42,13 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         try
         {
             
-            var book = await unitOfWork.BookRepository.GetSingleWithIncludeAsync(t => t.Id.ToLower() == id.ToLower(), t => t.Category,
-                t => t.Author);
+            var book = await unitOfWork
+                .BookRepository
+                .GetSingleWithIncludeAsync(t => t.Id.ToLower() == id.ToLower() 
+                                                && t.IsDeleted == false 
+                                                && t.Category.IsDeleted == false 
+                                                && t.Author.IsDeleted == false
+                    , t => t.Category, t => t.Author);
             return book;
         }
         catch (Exception e)
@@ -65,7 +70,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
 
             // Fetch books
             var booksList = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
-                b => b.AuthorId == parsedAuthorId && b.IsDeleted == false,
+                b => b.AuthorId == parsedAuthorId && b.IsDeleted == false && b.Category.IsDeleted == false && b.Author.IsDeleted == false,
                 b => b.Author,
                 b => b.Category
                 
@@ -97,7 +102,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         try
         {
             var books = await unitOfWork.BookRepository.GetAllWithIncludeAsync(
-                c => c.IsDeleted == false,
+                c => c.IsDeleted == false && c.Author.IsDeleted == false && c.Category.IsDeleted == false,
                 c => c.Category,
                 c => c.Author
                );
@@ -177,9 +182,36 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         }
     }
 
-    public Task<ResponseMessage<BookViewModel>> DeleteBook(string id)
+    public async Task<ResponseMessage<BookViewModel>> DeleteBook(string id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var book = await unitOfWork.BookRepository.GetSingleWithIncludeAsync(t => t.Id.ToLower() == id.ToLower());
+            if (book != null)
+            {
+                book.IsDeleted = true;
+                await unitOfWork.BookRepository.UpdateAsync(book);
+                unitOfWork.Save();
+                return new ResponseMessage<BookViewModel>()
+                {
+                    IsSuccess = true
+                };
+            }
+
+            return new ResponseMessage<BookViewModel>()
+            {
+                IsSuccess = false,
+                Message = "Book Not Found"
+            };
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<BookViewModel>()
+            {
+                IsSuccess = false,
+                Message = e.Message
+            };
+        }
     }
 
     private static string GenerateBookId()

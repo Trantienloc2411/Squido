@@ -12,6 +12,7 @@ public class RegisterRequestVm
     public string? LastName { get; set; } 
     public GenderEnum Gender { get; set; }
     [MaxLength(32)]
+    [MinLength(8)]
     public string? Password { get; set; }
     public int RoleId { get; set; }
 }

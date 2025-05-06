@@ -53,5 +53,38 @@ namespace WebApplication1.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(string? keyword, int currentPage = 1, int pageSize = 10)
+        {
+            try
+            {
+                var result = await userService.GetAllUser(keyword);
+                if (result.IsSuccess && result.Data != null)
+                {
+                    var totalRecords = result.Data.Count;
+                    var pagedData = result.Data
+                        .Skip((currentPage - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList();
+
+                    return Ok(new
+                    {
+                        records = pagedData,
+                        currentPage,
+                        pageSize,
+                        totalRecords
+                    });
+                }
+
+                return BadRequest(new { message = "Failed to retrieve users." });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
     }
 }
