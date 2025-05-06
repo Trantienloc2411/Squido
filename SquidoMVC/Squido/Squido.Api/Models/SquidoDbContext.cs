@@ -58,21 +58,22 @@ namespace WebApplication1.Models
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(o => o.OrderId)
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<OrderItem>()
-                .HasOne(o => o.Book)
-                .WithMany(b => b.OrderItems)
-                .HasForeignKey(o => o.BookId)
-                .OnDelete(DeleteBehavior.Restrict);
+
             
             modelBuilder.Entity<Rating>()
-                .HasOne(r => r.OrderItem)
+                .HasOne(r => r.Book)
                 .WithMany(o => o.Ratings)
-                .HasForeignKey(r => r.OrderItemId)
+                .HasForeignKey(r => r.BookId)
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Rating>()
                 .HasOne(c => c.Customer)
                 .WithMany(c => c.Ratings)
                 .HasForeignKey(c => c.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Rating>()
+                .HasOne(c=> c.Book)
+                .WithMany(b => b.Ratings)
+                .HasForeignKey(r => r.BookId)
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Author>()
                 .HasMany(a => a.Books)

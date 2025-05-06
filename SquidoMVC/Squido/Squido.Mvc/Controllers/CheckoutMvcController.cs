@@ -118,7 +118,7 @@ namespace Squido.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrder(OrderViewModel orderViewModel)
+        public async Task<IActionResult> CreateOrder(CreateOrderViewModel orderViewModel)
         {
             try
             {
@@ -133,7 +133,37 @@ namespace Squido.Controllers
                 }
                 else
                 {
+                    string customerId = HttpContext.Session.GetString("Id");
+                    if (string.IsNullOrEmpty(customerId))
+                    {
+                        TempData["Error"] = "Customer ID is missing.";
+                        return RedirectToAction("Index");
+                    }
+                    
+                    if (orderViewModel.OrderViewModel == null)
+                    {
+                        orderViewModel.OrderViewModel = new OrderViewModel();
+                    }
 
+                    orderViewModel.OrderViewModel.CustomerId = Guid.Parse(customerId);
+
+
+                    orderViewModel.OrderViewModel.OrderDate = DateTime.UtcNow;
+                    orderViewModel.OrderViewModel.Status = OrderStatusEnum.Pending;
+                    orderViewModel.OrderViewModel.OrderNote = orderViewModel.OrderViewModel.OrderNote;
+                    orderViewModel.OrderViewModel.ShippingFee = 5.00m;
+                    orderViewModel.OrderViewModel.PaymentMethod = PaymentMethodEnum.Paypal;
+                    orderViewModel.OrderItemViewModels = [];
+                    foreach (var item in cart)
+                    {
+                        var orderItem = new OrderItemViewModel
+                        {
+                            BookId = item.Id,
+                            Quantity = item.Quantity
+
+                        };
+                        orderViewModel.OrderItemViewModels.Add(orderItem);
+                    }
                 }
 
 
@@ -144,13 +174,13 @@ namespace Squido.Controllers
                 var client = httpClientFactory.CreateClient("Squido");
 
                 // Set authentication token
-                var token = HttpContext.Session.GetString("Token");
-                if (!string.IsNullOrEmpty(token))
-                {
-                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                }
+                // var token = HttpContext.Session.GetString("Token");
+                // if (!string.IsNullOrEmpty(token))
+                // {
+                //     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                // }
 
-                var response = await client.PostAsJsonAsync("/api/Order", new { orderViewModel });
+                var response = await client.PostAsJsonAsync("/api/Order", orderViewModel );
 
                 if (response.IsSuccessStatusCode)
                 {

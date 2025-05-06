@@ -28,9 +28,4 @@ public enum PaymentMethodEnum
     ApplePay,
 }
 
-public enum PaymentMethod
-{
-    Credit,
-    Paypal,
-    ApplePay
-}
+

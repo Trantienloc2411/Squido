@@ -180,6 +180,22 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
         }
     }
 
+    [HttpDelete("api/Book/{id}")]
+    public async Task<IActionResult> DeleteBook([FromRoute (Name = "id")]string id)
+    {
+        try
+        {
+            var result = await bookService.DeleteBook(id);
+            if (result.IsSuccess) return Ok(result.IsSuccess);
+            else return BadRequest(result.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }        
+    }
+
     
 
 }

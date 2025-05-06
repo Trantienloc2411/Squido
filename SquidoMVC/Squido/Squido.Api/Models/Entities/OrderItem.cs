@@ -25,7 +25,5 @@ public class OrderItem
         
     [ForeignKey("BookId")]
     public Book Book { get; set; }
-        
-    // Navigation property
-    public virtual ICollection<Rating> Ratings { get; set; }
+    
 }

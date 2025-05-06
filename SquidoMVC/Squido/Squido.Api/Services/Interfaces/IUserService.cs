@@ -12,4 +12,7 @@ public interface IUserService
 
     Task<ResponseMessage<UserViewModel>> UpdateUserAsync(UserViewModel userViewModel, Guid userId); // <T>
 
+    Task<ResponseMessage<List<UserViewModel>>> GetAllUser(string? keyword);
+    Task<ResponseMessage<UserViewModel>> DeleteUserAsync(Guid userId);
+
 }

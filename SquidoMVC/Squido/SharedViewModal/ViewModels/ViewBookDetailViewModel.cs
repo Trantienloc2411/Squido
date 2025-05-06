@@ -8,6 +8,8 @@ public class ViewBookDetailViewModel
     
     public List<BookViewModel>? BookRelated {get;set;} 
     
+    public List<RatingViewModel>? Rating {get;set;}
+    
     public string? BookDescription {get;set;} 
     //Author
     public string? Bio { get; set; } 
