@@ -40,7 +40,7 @@ namespace WebApplication1.Models.Entities
         
         // Navigation properties
         public virtual ICollection<OrderItem> OrderItems { get; set; }
-        
+        public virtual ICollection<Rating> Ratings { get; set; }
         public virtual Author Author { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 import type React from "react"
 import { Box, Flex, VStack, Text, Icon, useColorModeValue, Divider } from "@chakra-ui/react"
 import { NavLink } from "react-router-dom"
-import { FiHome, FiBook, FiUsers, FiShoppingCart, FiBarChart2, FiSettings, FiHelpCircle } from "react-icons/fi"
+import { FiHome, FiBook, FiUsers, FiShoppingCart, FiBarChart2, FiSettings, FiHelpCircle, FiTag } from "react-icons/fi"
 
 interface SidebarProps {
   isOpen: boolean
@@ -72,6 +72,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         </NavItem>
         <NavItem icon={FiBook} to="/books">
           Books
+        </NavItem>
+        <NavItem icon={FiTag} to="/categories">
+          Categories
         </NavItem>
         <NavItem icon={FiUsers} to="/users">
           Users

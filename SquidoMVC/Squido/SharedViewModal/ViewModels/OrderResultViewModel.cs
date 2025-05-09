@@ -21,3 +21,10 @@ public enum OrderStatusEnum
     Completed,
     Canceled 
 }
+
+public enum PaymentMethod
+{
+    CreditCard,
+    Paypal,
+    ApplePay,
+}

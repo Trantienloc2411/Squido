@@ -32,6 +32,10 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Id,
                 opt => opt.MapFrom(src => src.Id))
             .ReverseMap();
+            
+        CreateMap<Category, CreateCategoryModel>()
+            .ReverseMap();
+        
 
         CreateMap<UserViewModel, User>()
             .ForMember(dest => dest.Role, opt =>
@@ -65,6 +69,33 @@ public class MappingProfile : Profile
                 opt => opt.MapFrom(src => src.Id))
             .ReverseMap();
         CreateMap<Author, CreateAuthorViewModel>().ReverseMap();
+
+        CreateMap<Rating, RatingViewModel>()
+            .ForMember(dest => dest.Id,
+                opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.CreatedDate, opt
+                => opt.MapFrom(src => src.CreatedDate))
+            .ForMember(dest => dest.CustomerId, opt
+                => opt.MapFrom(src => src.CustomerId))
+            .ForMember(dest => dest.Comment, opt
+                => opt.MapFrom(src => src.Comment))
+            .ForMember(dest => dest.RatingValue,
+                opt
+                    => opt.MapFrom(src => src.RatingValue))
+            .ForMember(dest => dest.BookId, opt => opt.MapFrom(src
+                => src.BookId))
+            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.Customer))
+            .ReverseMap()
+            ;
+
+        CreateMap<Rating, CreateRatingViewModel>()
+            .ForMember(dest => dest.RatingValue,
+                opt => opt.MapFrom(src => src.RatingValue))
+            .ReverseMap();
+
+
+
+
 
 
     }

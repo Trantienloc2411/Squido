@@ -84,16 +84,30 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading, pagination, searc
 
     setIsDeleting(true)
     try {
-      await dispatch(deleteBook(bookToDelete.id)) // Changed from bookId to id
-      toast({
-        title: "Book deleted",
-        description: `"${bookToDelete.title}" has been deleted successfully.`,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      })
-      onDeleteClose()
+      await dispatch(deleteBook(bookToDelete.id))
+        .unwrap()
+        .then(() => {
+          toast({
+            title: "Book deleted",
+            description: `"${bookToDelete.title}" has been deleted successfully.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          })
+          onDeleteClose()
+        })
+        .catch((error) => {
+          console.error("Delete error:", error)
+          toast({
+            title: "Error",
+            description: typeof error === "string" ? error : "Failed to delete the book. Please try again.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          })
+        })
     } catch (error) {
+      console.error("Delete error:", error)
       toast({
         title: "Error",
         description: "Failed to delete the book. Please try again.",

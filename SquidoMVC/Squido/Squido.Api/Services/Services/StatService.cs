@@ -10,8 +10,8 @@ public class StatService(IUnitOfWork unitOfWork) : IStatsService
 
     public async Task<StatViewModel> GetStatsAsync()
     {
-        var totalBooks = await unitOfWork.BookRepository.CountAsync(b => b.IsDeleted == false);
-        var totalCategories = await unitOfWork.CategoryRepository.CountAsync(t => true);
+        var totalBooks = await unitOfWork.BookRepository.CountAsync(b => b.IsDeleted == false && b.Category.IsDeleted == false && b.Author.IsDeleted == false);
+        var totalCategories = await unitOfWork.CategoryRepository.CountAsync(t => t.IsDeleted == false);
         var totalCustomers = await unitOfWork.UserRepository.CountAsync(c => c.IsDeleted == false && c.RoleId == 1);
 
         var getAllOrders = await unitOfWork.OrderRepository.GetAllWithIncludeAsync(o => o.Status == Models.enums.OrderStatusEnum.Completed, o => o.OrderItems);

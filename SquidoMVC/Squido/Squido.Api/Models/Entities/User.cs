@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WebApplication1.Models.enums;
+using GenderEnum = SharedViewModal.EnumModel.GenderEnum;
 
 namespace WebApplication1.Models.Entities;
 
@@ -15,7 +16,7 @@ public class User
         
         public string? LastName { get; set; } 
         
-        public GenderEnum Gender { get; set; }
+        public enums.GenderEnum Gender { get; set; }
         
         public string Email { get; set; }
         

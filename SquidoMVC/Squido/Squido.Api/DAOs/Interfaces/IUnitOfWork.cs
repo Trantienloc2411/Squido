@@ -1,6 +1,6 @@
-﻿using WebApplication1.Models.Entities;
+﻿    using WebApplication1.Models.Entities;
 
-namespace WebApplication1.DAOs.Interfaces;
+    namespace WebApplication1.DAOs.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {

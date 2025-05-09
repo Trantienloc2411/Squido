@@ -16,7 +16,7 @@ public class BookMvcController(IHttpClientFactory clientFactory) : BaseControlle
         {
             var client = clientFactory.CreateClient("Squido");
             var responseBook = await client.GetAsync($"/api/Book/{id}");
-            
+            var responseRating = await client.GetAsync($"/api/Rating/{id}");
             if (responseBook.IsSuccessStatusCode)
             {
                 var content  = await responseBook.Content.ReadAsStringAsync();

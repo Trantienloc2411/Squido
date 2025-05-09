@@ -353,19 +353,51 @@ export const updateBook = createAsyncThunk(
 )
 
 // Delete a book
-export const deleteBook = createAsyncThunk("books/deleteBook", async (id: string) => {
+export const deleteBook = createAsyncThunk("books/deleteBook", async (id: string, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/Book/${id}`, {
+    console.log(`Deleting book with ID: ${id}`)
+    const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:5083/api"
+
+    const response = await fetch(`${API_URL}/Book/${id}`, {
       method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
     })
 
+    console.log(`Delete response status: ${response.status}`)
+
     if (!response.ok) {
-      throw new Error("Failed to delete book")
+      let errorText
+      try {
+        errorText = await response.text()
+        console.error(`API request failed with status ${response.status}:`, errorText)
+      } catch (e) {
+        errorText = `Could not read error response: ${e}`
+      }
+      return rejectWithValue(`Failed to delete book: ${errorText}`)
+    }
+
+    // Some APIs return no content for DELETE operations
+    let responseData
+    try {
+      const text = await response.text()
+      responseData = text ? JSON.parse(text) : {}
+      console.log("Delete book response:", responseData)
+    } catch (e) {
+      console.log("No response body or invalid JSON")
+    }
+
+    // Check if the API returned a success response
+    if (responseData && typeof responseData.isSuccess !== "undefined" && !responseData.isSuccess) {
+      return rejectWithValue(responseData.exceptionMessage || responseData.message || "Failed to delete book")
     }
 
     return id
   } catch (error) {
-    throw new Error("Failed to delete book")
+    console.error("Error deleting book:", error)
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to delete book")
   }
 })
 

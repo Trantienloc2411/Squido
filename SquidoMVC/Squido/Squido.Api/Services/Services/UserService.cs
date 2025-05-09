@@ -39,10 +39,10 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
     {
         try
         {
-
             if (IsUserExists(registerRequestVm.Email))
             {
-                return ResponseFactory.Error<RegisterRequestVm>("User with the same email already exists", "USER_EXISTS");
+                return ResponseFactory.Error<RegisterRequestVm>("User with the same email already exists",
+                    "USER_EXISTS");
             }
             else
             {
@@ -62,7 +62,8 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
 
     private bool IsUserExists(string? email)
     {
-        return uoW.UserRepository.GetAll().Where(c => c.IsDeleted == false).Any(c => string.Equals(c.Email, email, StringComparison.CurrentCultureIgnoreCase));
+        return uoW.UserRepository.GetAll().Where(c => c.IsDeleted == false).Any(c =>
+            string.Equals(c.Email, email, StringComparison.CurrentCultureIgnoreCase));
     }
 
     private static string Hashing(string password)
@@ -88,6 +89,7 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
             {
                 return ResponseFactory.Error<UserViewModel>("User not found", "USER_NOT_FOUND");
             }
+
             var result = mapper.Map<UserViewModel>(user);
             return ResponseFactory.Success(result, "User Found");
         }
@@ -104,7 +106,9 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
         {
             if (IsUserExists(userId))
             {
-                var userOld = await uoW.UserRepository.GetSingleWithIncludeAsync(c => c.Id == userId && c.IsDeleted == false, c => c.Role);
+                var userOld =
+                    await uoW.UserRepository.GetSingleWithIncludeAsync(c => c.Id == userId && c.IsDeleted == false,
+                        c => c.Role);
                 int role = userOld.RoleId;
                 GenderEnum gender = userOld.Gender;
                 // Map updated fields into the existing entity
@@ -127,6 +131,47 @@ public class UserService(IUnitOfWork uoW, IMapper mapper, ILogger<UserService> l
         {
             return ResponseFactory.Exception<UserViewModel>(ex);
         }
+    }
+
+    public async Task<ResponseMessage<List<UserViewModel>>> GetAllUser(string? keyword)
+    {
+        try
+        {
+            var users = (await uoW
+                .UserRepository
+                .GetAllWithIncludeAsync(v => v.IsDeleted == false,  t=> t.Role)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower();
+                users = users.Where(c =>
+                    (c.Email != null && c.Email.ToLower().Contains(keyword)) ||
+                    (c.FirstName != null && c.FirstName.ToLower().Contains(keyword)) ||
+                    (c.LastName != null && c.LastName.ToLower().Contains(keyword)) ||
+                    (c.Phone != null && c.Phone.ToLower().Contains(keyword))
+                ).ToList();
+            }
+
+
+            
+
+            return new ResponseMessage<List<UserViewModel>>()
+            {
+                Data = mapper.Map<List<UserViewModel>>(users),
+                IsSuccess = true, // Optional
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+    }
+
+
+    public Task<ResponseMessage<UserViewModel>> DeleteUserAsync(Guid userId)
+    {
+        throw new NotImplementedException();
     }
 
 

@@ -143,7 +143,15 @@
                                 <a class="text-decoration-none text-black" asp-controller="BookMvc" asp-action="Details"
                                     asp-route-id="@item.Id">
                                     <div class="book-image">
-                                        <img src="~/images/1_.jpg" alt="@item.Title" class="img-fluid">
+                                        @if (item.ImageUrl != null || item.ImageUrl == "")
+                                        {
+                                            <img src="@item.ImageUrl" alt="@item.ImageUrl" class="img-fluid">
+                                        }
+                                        else
+                                        {
+                                            <img src="~/images/1_.jpg" alt="@item.ImageUrl" class="img-fluid">
+                                        }
+                                        
                                     </div>
                                     <div class="book-info">
                                         <h5 class="book-title">@item.Title</h5>

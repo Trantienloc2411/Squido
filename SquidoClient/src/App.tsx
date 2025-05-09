@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard"
 import BookManagement from "./pages/BookManagement"
 import UserManagement from "./pages/UserManagement"
 import OrderManagement from "./pages/OrderManagement"
+import CategoryManagement from "./pages/CategoryManagement"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/auth/ProtectedRoute"
 
@@ -29,6 +30,7 @@ const App: React.FC = () => {
           <Route path="books/*" element={<BookManagement />} />
           <Route path="users/*" element={<UserManagement />} />
           <Route path="orders/*" element={<OrderManagement />} />
+          <Route path="categories" element={<CategoryManagement />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
