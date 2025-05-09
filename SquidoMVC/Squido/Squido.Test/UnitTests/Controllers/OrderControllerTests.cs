@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using WebApplication1.Controllers;
@@ -28,7 +29,8 @@ public class OrderControllerTests
             OrderDate = DateTime.UtcNow,
             PaymentMethod = PaymentMethodEnum.CreditCard,
             Status = OrderStatusEnum.Pending,
-            OrderNote = "Test order"
+            OrderNote = "Test order",
+            ShippingFee = 0
         };
 
         var orderItems = new List<OrderItemViewModel>
@@ -44,6 +46,12 @@ public class OrderControllerTests
             }
         };
 
+        var createOrderModel = new CreateOrderViewModel
+        {
+            OrderViewModel = order,
+            OrderItemViewModels = orderItems
+        };
+
         var response = new ResponseMessage<OrderResultViewModel>
         {
             IsSuccess = true,
@@ -52,8 +60,8 @@ public class OrderControllerTests
             {
                 Id = Guid.NewGuid().ToString(),
                 OrderDate = order.OrderDate,
-                Status = order.Status.Value,
-                PaymentMethod = PaymentMethod.Credit,
+                Status = OrderStatusEnum.Pending,
+                PaymentMethod = (PaymentMethod)order.PaymentMethod,
                 OrderNote = order.OrderNote,
                 UserViewModel = new UserViewModel
                 {
@@ -71,17 +79,19 @@ public class OrderControllerTests
             .ReturnsAsync(response);
 
         // Act
-        var result = await _controller.CreateOrder(order, orderItems);
+        var result = await _controller.CreateOrder(createOrderModel);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnValue = Assert.IsType<OrderResultViewModel>(okResult.Value);
         Assert.Equal(order.OrderDate, returnValue.OrderDate);
-        Assert.Equal(order.Status, returnValue.Status);
-        Assert.Equal(PaymentMethod.Credit, returnValue.PaymentMethod);
+        Assert.Equal(OrderStatusEnum.Pending, returnValue.Status);
+        Assert.Equal((PaymentMethod)order.PaymentMethod, returnValue.PaymentMethod);
         Assert.Equal(order.OrderNote, returnValue.OrderNote);
         Assert.NotNull(returnValue.UserViewModel);
         Assert.Equal(order.CustomerId.ToString(), returnValue.UserViewModel.Id);
+        Assert.NotNull(returnValue.OrderItemViewModels);
+        Assert.Single(returnValue.OrderItemViewModels);
     }
 
     [Fact]
@@ -94,10 +104,17 @@ public class OrderControllerTests
             OrderDate = DateTime.UtcNow,
             PaymentMethod = PaymentMethodEnum.CreditCard,
             Status = OrderStatusEnum.Pending,
-            OrderNote = "Test order"
+            OrderNote = "Test order",
+            ShippingFee = 0
         };
 
         var orderItems = new List<OrderItemViewModel>();
+
+        var createOrderModel = new CreateOrderViewModel
+        {
+            OrderViewModel = order,
+            OrderItemViewModels = orderItems
+        };
 
         var response = new ResponseMessage<OrderResultViewModel>
         {
@@ -111,7 +128,7 @@ public class OrderControllerTests
             .ReturnsAsync(response);
 
         // Act
-        var result = await _controller.CreateOrder(order, orderItems);
+        var result = await _controller.CreateOrder(createOrderModel);
 
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -128,7 +145,8 @@ public class OrderControllerTests
             OrderDate = DateTime.UtcNow,
             PaymentMethod = PaymentMethodEnum.CreditCard,
             Status = OrderStatusEnum.Pending,
-            OrderNote = "Test order"
+            OrderNote = "Test order",
+            ShippingFee = 0
         };
 
         var orderItems = new List<OrderItemViewModel>
@@ -144,16 +162,22 @@ public class OrderControllerTests
             }
         };
 
+        var createOrderModel = new CreateOrderViewModel
+        {
+            OrderViewModel = order,
+            OrderItemViewModels = orderItems
+        };
+
         _mockOrderService
             .Setup(service => service.CreateOrderAsync(order, orderItems))
             .ThrowsAsync(new Exception("Service error"));
 
         // Act
-        var result = await _controller.CreateOrder(order, orderItems);
+        var result = await _controller.CreateOrder(createOrderModel);
 
         // Assert
         var statusCodeResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, statusCodeResult.StatusCode);
+        Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
         Assert.Equal("Service error", statusCodeResult.Value);
     }
 } 

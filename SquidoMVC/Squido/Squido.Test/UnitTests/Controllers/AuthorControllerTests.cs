@@ -30,8 +30,8 @@ public class AuthorControllerTests
         var pageSize = 10;
         var authors = new List<AuthorViewModel>
         {
-            new() { AuthorId = "1", FullName = "Author 1" },
-            new() { AuthorId = "2", FullName = "Author 2" }
+            new() { Id = "1", FullName = "Author 1" },
+            new() { Id = "2", FullName = "Author 2" }
         };
 
         _mockAuthorService
@@ -115,7 +115,7 @@ public class AuthorControllerTests
             .ReturnsAsync(authors);
 
         _mockAuthorService
-            .Setup(service => service.GetAuthorsPaginated(page, pageSize, keyword))
+            .Setup(service => service.GetAuthors(page, pageSize, keyword))
             .ReturnsAsync(authors);
 
         // Act
