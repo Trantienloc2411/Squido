@@ -44,10 +44,12 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper) : IOrderServic
                         OrderId = orderItem.OrderId,
                         BookId = orderItem.BookId,
                         Title = book.Title,
-                        AuthorName = book.Author?.FullName,
-                        CategoryName = book.Category?.Name,
+                        AuthorName = book.Author?.FullName ?? string.Empty,
+                        CategoryName = book.Category?.Name ?? string.Empty,
                         Quantity = orderItem.Quantity,
                         UnitPrice = book.Price,
+                        Order = order,
+                        Book = book
                     })
                 .ToList();
 
@@ -55,7 +57,6 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper) : IOrderServic
             {
                 await unitOfWork.OrderItemRepository.AddAsync(orderItemEntity);
             }
-
 
             unitOfWork.Save();
 
@@ -85,7 +86,7 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper) : IOrderServic
             {
                 IsSuccess = true,
                 Message = "Order created successfully",
-                Data = mapper.Map<OrderResultViewModel>(order)
+                Data = result
             };
         }
         catch (System.Exception ex)
@@ -143,12 +144,30 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper) : IOrderServic
                 c => c.CustomerId == userId, 
                 t => t.OrderItems,
                 t => t.Customer);
-            if(order == null) return ResponseFactory.Error<List<OrderResultViewModel>>("Order not found");
-            return ResponseFactory.Success<List<OrderResultViewModel>>(mapper.Map<List<OrderResultViewModel>>(order),"Order found");
+            if(order == null) 
+            {
+                return new ResponseMessage<List<OrderResultViewModel>>
+                {
+                    IsSuccess = false,
+                    Message = "Order not found",
+                    Data = null
+                };
+            }
+            return new ResponseMessage<List<OrderResultViewModel>>
+            {
+                IsSuccess = true,
+                Message = "Order found",
+                Data = mapper.Map<List<OrderResultViewModel>>(order)
+            };
         }
         catch (Exception e)
         {
-            return ResponseFactory.Exception<List<OrderResultViewModel>>(e);
+            return new ResponseMessage<List<OrderResultViewModel>>
+            {
+                IsSuccess = false,
+                Message = e.Message,
+                Data = null
+            };
         }
     }
 
@@ -160,18 +179,32 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper) : IOrderServic
 
             if (keyword is null)
             {
-                return ResponseFactory.Success<List<OrderViewModel>>(mapper.Map<List<OrderViewModel>>(order), "Success");
+                return new ResponseMessage<List<OrderViewModel>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = mapper.Map<List<OrderViewModel>>(order)
+                };
             }
             else
             {
                 var result = order.Where(c => c.Id.ToLower().Contains(keyword.ToLower()));
-                return ResponseFactory.Success<List<OrderViewModel>>(mapper.Map<List<OrderViewModel>>(result), "Success");
+                return new ResponseMessage<List<OrderViewModel>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = mapper.Map<List<OrderViewModel>>(result)
+                };
             }
-            
         }
         catch (Exception e)
         {
-            return ResponseFactory.Exception<List<OrderViewModel>>(e);
+            return new ResponseMessage<List<OrderViewModel>>
+            {
+                IsSuccess = false,
+                Message = e.Message,
+                Data = null
+            };
         }
     }
 

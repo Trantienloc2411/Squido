@@ -22,58 +22,55 @@ public class StatsControllerTests
     public async Task GetStats_ReturnsStatsViewModel()
     {
         // Arrange
-        var books = new List<BookViewModel>
+        var stats = new StatViewModel
         {
-            new() { Id = "1", Title = "Book 1" },
-            new() { Id = "2", Title = "Book 2" }
-        };
-
-        var categories = new List<CategoryViewModel>
-        {
-            new() { Id = 1, Name = "Category 1" },
-            new() { Id = 2, Name = "Category 2" }
+            TopBooks = new List<BookViewModel>
+            {
+                new() { Id = "1", Title = "Book 1" },
+                new() { Id = "2", Title = "Book 2" }
+            },
+            TopCategories = new List<CategoryViewModel>
+            {
+                new() { Id = 1, Name = "Category 1" },
+                new() { Id = 2, Name = "Category 2" }
+            }
         };
 
         _mockStatsService
-            .Setup(service => service.GetTopBooks())
-            .ReturnsAsync(books);
-
-        _mockStatsService
-            .Setup(service => service.GetTopCategories())
-            .ReturnsAsync(categories);
+            .Setup(service => service.GetStatsAsync())
+            .ReturnsAsync(stats);
 
         // Act
         var result = await _controller.GetStats();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnValue = Assert.IsType<StatsViewModel>(okResult.Value);
-        Assert.Equal(2, returnValue.TopBooks.Count());
-        Assert.Equal(2, returnValue.TopCategories.Count());
+        var returnValue = Assert.IsType<StatViewModel>(okResult.Value);
+        Assert.Equal(2, returnValue.TopBooks?.Count ?? 0);
+        Assert.Equal(2, returnValue.TopCategories?.Count ?? 0);
     }
 
     [Fact]
     public async Task GetStats_WithEmptyData_ReturnsEmptyStats()
     {
         // Arrange
-        var emptyBooks = new List<BookViewModel>();
-        var emptyCategories = new List<CategoryViewModel>();
+        var stats = new StatViewModel
+        {
+            TopBooks = new List<BookViewModel>(),
+            TopCategories = new List<CategoryViewModel>()
+        };
 
         _mockStatsService
-            .Setup(service => service.GetTopBooks())
-            .ReturnsAsync(emptyBooks);
-
-        _mockStatsService
-            .Setup(service => service.GetTopCategories())
-            .ReturnsAsync(emptyCategories);
+            .Setup(service => service.GetStatsAsync())
+            .ReturnsAsync(stats);
 
         // Act
         var result = await _controller.GetStats();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnValue = Assert.IsType<StatsViewModel>(okResult.Value);
-        Assert.Empty(returnValue.TopBooks);
-        Assert.Empty(returnValue.TopCategories);
+        var returnValue = Assert.IsType<StatViewModel>(okResult.Value);
+        Assert.Empty(returnValue.TopBooks ?? new List<BookViewModel>());
+        Assert.Empty(returnValue.TopCategories ?? new List<CategoryViewModel>());
     }
 } 

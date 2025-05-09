@@ -84,11 +84,13 @@ public class BookControllerTests
     {
         // Arrange
         var bookId = "1";
+        var authorId = Guid.NewGuid();
         var book = new Book 
         { 
             Id = bookId, 
             Title = "Test Book",
-            Author = new Author { Bio = "Test Bio" },
+            AuthorId = authorId,
+            Author = new Author { Id = authorId, Bio = "Test Bio" },
             Category = new Category(),
             Description = "Test Description"
         };
@@ -102,7 +104,11 @@ public class BookControllerTests
         var viewBookDetailViewModel = new ViewBookDetailViewModel
         {
             Book = bookViewModel,
-            RatingValueAverage = 4.5
+            Category = categoryViewModel,
+            Bio = "Test Bio",
+            RatingValueAverage = 4.5,
+            BookDescription = "Test Description",
+            BookRelated = relatedBooks
         };
 
         _mockBookService
@@ -110,7 +116,7 @@ public class BookControllerTests
             .ReturnsAsync(book);
 
         _mockBookService
-            .Setup(service => service.GetBookByAuthorId(It.IsAny<string>(), bookId))
+            .Setup(service => service.GetBookByAuthorId(authorId.ToString(), bookId))
             .ReturnsAsync(relatedBooks);
 
         _mockMapper
@@ -123,7 +129,15 @@ public class BookControllerTests
 
         _mockMapper
             .Setup(m => m.Map<ViewBookDetailViewModel>(It.IsAny<Book>()))
-            .Returns(viewBookDetailViewModel);
+            .Returns(new ViewBookDetailViewModel
+            {
+                Book = bookViewModel,
+                Category = categoryViewModel,
+                Bio = "Test Bio",
+                RatingValueAverage = 4.5,
+                BookDescription = "Test Description",
+                BookRelated = relatedBooks
+            });
 
         // Act
         var result = await _controller.GetBook(bookId);
@@ -135,6 +149,9 @@ public class BookControllerTests
         Assert.Equal(bookId, returnValue.Book.Id);
         Assert.Equal("Test Book", returnValue.Book.Title);
         Assert.Equal(4.5, returnValue.RatingValueAverage);
+        Assert.Equal("Test Bio", returnValue.Bio);
+        Assert.Equal("Test Description", returnValue.BookDescription);
+        Assert.Empty(returnValue.BookRelated);
     }
 
     [Fact]
