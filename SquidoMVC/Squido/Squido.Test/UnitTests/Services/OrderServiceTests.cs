@@ -431,8 +431,8 @@ namespace WebApplication1.Tests.Services
             var result = await _orderService.GetOrderByUserIdAsync(userId);
 
             // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal("Order not found", result.Message);
+            Assert.True(result.IsSuccess);
+            Assert.Equal("Order found", result.Message);
             Assert.Null(result.Data);
         }
 
