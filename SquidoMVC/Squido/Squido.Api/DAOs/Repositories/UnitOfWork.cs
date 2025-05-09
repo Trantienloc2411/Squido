@@ -114,6 +114,21 @@ public class UnitOfWork(SquidoDbContext context) : IUnitOfWork
         }
         _context.SaveChanges();
     }
+    
+    public async Task SaveAsync()
+    {
+        var validationErrors = _context.ChangeTracker.Entries<IValidatableObject>()
+            .SelectMany(e => e.Entity.Validate(null))
+            .Where(e => e != ValidationResult.Success)
+            .ToArray();
+        if (validationErrors.Any())
+        {
+            var exceptionMessage = string.Join(Environment.NewLine,
+                validationErrors.Select(error => $"Properties {error.MemberNames} Error: {error.ErrorMessage}"));
+            throw new Exception(exceptionMessage);
+        }
+        await _context.SaveChangesAsync();
+    }
 
     private bool disposed = false;
 

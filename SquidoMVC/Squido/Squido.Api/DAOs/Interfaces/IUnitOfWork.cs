@@ -15,4 +15,5 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<Author> AuthorRepository { get; }
     IGenericRepository<RefreshToken> RefreshTokenRepository {get;}
     void Save();
+    Task SaveAsync();
 }

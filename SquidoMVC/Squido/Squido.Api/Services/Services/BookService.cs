@@ -155,10 +155,97 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
         }
     }
 
-    public Task<ResponseMessage<BookViewModel>> UpdateBook(string id, BookViewModel bookViewModel)
+    public async Task<ResponseMessage<BookViewModel>> UpdateBook(string id, CreateBookViewModel bookViewModel)
+{
+    try
     {
-        throw new NotImplementedException();
+        // Retrieve the book with related data
+        var book = await unitOfWork.BookRepository.GetSingleWithIncludeAsync(
+            t => t.BookId.ToLower() == id.ToLower(),
+            t => t.Category,
+            t => t.Author,
+            t => t.ImageBooks);
+
+        if (book == null)
+        {
+            return new ResponseMessage<BookViewModel>
+            {
+                IsSuccess = false,
+                Message = "Book not found"
+            };
+        }
+
+        // Update book properties
+        book.Title = bookViewModel.Title ?? book.Title;
+        book.CategoryId = bookViewModel.CategoryId ?? book.CategoryId;
+        book.AuthorId = bookViewModel.AuthorId ?? book.AuthorId;
+        book.Description = bookViewModel.Description ?? book.Description;
+        book.Quantity = bookViewModel.Quantity;
+        book.Price = bookViewModel.Price;
+        book.UpdatedDate = DateTime.UtcNow;
+
+        // Handle image updates
+        if (bookViewModel.ImageUrls != null && bookViewModel.ImageUrls.Any())
+        {
+            // Remove existing images that are not in the new list
+            var imagesToRemove = book.ImageBooks
+                .Where(img => !bookViewModel.ImageUrls.Contains(img.UrlImage))
+                .ToList();
+            
+            foreach (var image in imagesToRemove)
+            {
+                image.IsDeleted = true;
+            }
+
+            // Add new images
+            var existingUrls = book.ImageBooks.Select(img => img.UrlImage).ToList();
+            var newImages = bookViewModel.ImageUrls
+                .Where(url => !existingUrls.Contains(url))
+                .Select(url => new ImageBook
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UrlImage = url,
+                    BookId = book.BookId,
+                    IsDeleted = false
+                });
+
+            foreach (var newImage in newImages)
+            {
+                book.ImageBooks.Add(newImage);
+            }
+        }
+
+        // Update the book in the repository
+        unitOfWork.BookRepository.Update(book);
+        await unitOfWork.SaveAsync();
+
+        // Map to view model for response
+        var updatedBookViewModel = mapper.Map<BookViewModel>(book);
+        updatedBookViewModel.CategoryName = book.Category?.Name;
+        updatedBookViewModel.AuthorName = book.Author?.FullName;
+        updatedBookViewModel.ImageUrls = book.ImageBooks
+            .Where(img => !img.IsDeleted)
+            .Select(img => img.UrlImage)
+            .ToList();
+
+        return new ResponseMessage<BookViewModel>
+        {
+            IsSuccess = true,
+            Message = "Book updated successfully",
+            Data = updatedBookViewModel
+        };
     }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+        return new ResponseMessage<BookViewModel>
+        {
+            IsSuccess = false,
+            Message = $"Error updating book: {e.Message}"
+        };
+    }
+}
+
 
     public Task<ResponseMessage<BookViewModel>> DeleteBook(string id)
     {

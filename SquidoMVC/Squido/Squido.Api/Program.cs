@@ -25,7 +25,7 @@ public class Program
         builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        builder.Services.AddScoped<JwtService>();
+        builder.Services.AddScoped<IJwtService, JwtService>();
 
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<IBookService, BookService>();

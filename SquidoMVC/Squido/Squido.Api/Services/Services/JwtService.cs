@@ -4,11 +4,12 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using WebApplication1.DAOs.Interfaces;
 using WebApplication1.Models.Entities;
+using WebApplication1.Services.Interfaces;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace WebApplication1.Services.Services;
 
-public class JwtService
+public class JwtService : IJwtService
 {
     private readonly IUnitOfWork uoW;
     private readonly IConfiguration config;
@@ -69,29 +70,27 @@ public class JwtService
     }
 
     public async Task<RefreshToken?> GetValidRefreshTokenAsync(string token, Guid userId)
-{
-    var storedToken = await uoW.RefreshTokenRepository
-        .GetSingleWithIncludeAsync(rt => rt.Token == token && rt.UserId == userId);
+    {
+        var storedToken = await uoW.RefreshTokenRepository
+            .GetSingleWithIncludeAsync(rt => rt.Token == token && rt.UserId == userId);
 
-    if (storedToken == null || storedToken.IsExpired)
-        return null;
+        if (storedToken == null || storedToken.IsExpired)
+            return null;
 
-    return storedToken;
-}
-
+        return storedToken;
+    }
 
     public async Task RevokeRefreshTokenAsync(string token)
-{
-    var storedToken = await uoW.RefreshTokenRepository
-        .GetSingleWithIncludeAsync(rt => rt.Token == token);
-
-    if (storedToken != null)
     {
-        await uoW.RefreshTokenRepository.DeleteAsync(storedToken);
-        uoW.Save();
-    }
-}
+        var storedToken = await uoW.RefreshTokenRepository
+            .GetSingleWithIncludeAsync(rt => rt.Token == token);
 
+        if (storedToken != null)
+        {
+            await uoW.RefreshTokenRepository.DeleteAsync(storedToken);
+            uoW.Save();
+        }
+    }
 
     public ClaimsPrincipal ValidateAccessToken(string token)
     {

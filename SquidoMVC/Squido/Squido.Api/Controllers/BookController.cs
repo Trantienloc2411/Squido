@@ -161,6 +161,28 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
         }
     }
 
+    [HttpPut("api/Book/{id}")]
+    public async Task<IActionResult> UpdateBook(string id, [FromBody] CreateBookViewModel bookViewModel)
+    {
+        try
+        {
+            var result = await bookService.UpdateBook(id, bookViewModel);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
     
 
 }

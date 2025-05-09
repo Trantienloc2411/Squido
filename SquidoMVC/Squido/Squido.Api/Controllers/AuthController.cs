@@ -10,10 +10,10 @@ namespace WebApplication1.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly JwtService jwtService;
+    private readonly IJwtService jwtService;
     private readonly IUserService userService;
 
-    public AuthController(JwtService jwtService, IUserService userService)
+    public AuthController(IJwtService jwtService, IUserService userService)
     {
         this.jwtService = jwtService;
         this.userService = userService;
