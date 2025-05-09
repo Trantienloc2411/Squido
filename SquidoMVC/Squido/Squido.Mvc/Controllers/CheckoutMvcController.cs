@@ -47,13 +47,13 @@ namespace Squido.Controllers
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 }
                 var result = bookList!.Where(b
-                    => cart.Any(c => c.BookId == b.BookId)).ToList();
+                    => cart.Any(c => c.Id == b.Id)).ToList();
 
                 var cartItems = result.Select(item => new CartItemViewModel
                 {
-                    BookId = item.BookId,
+                    Id = item.Id,
                     Price = item.Price,
-                    QuantityCart = cart.FirstOrDefault(c => c.BookId == item.BookId)?.Quantity ?? 0,
+                    QuantityCart = cart.FirstOrDefault(c => c.Id == item.Id)?.Quantity ?? 0,
                     QuantityOnStore = item.Quantity,
                     Title = item.Title,
                     AuthorName = item.AuthorName

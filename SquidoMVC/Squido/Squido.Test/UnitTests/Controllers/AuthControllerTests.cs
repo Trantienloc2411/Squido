@@ -40,7 +40,7 @@ public class AuthControllerTests
             Username = "testuser",
             Email = "test@example.com",
             IsDeleted = false,
-            Role = new RoleViewModel { RoleId = 1 }
+            Role = new RoleViewModel { Id = 1 }
         };
 
         _mockUserService
@@ -62,11 +62,17 @@ public class AuthControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnValue = okResult.Value as dynamic;
         Assert.NotNull(returnValue);
-        Assert.Equal("access_token", returnValue.AccessToken.ToString());
-        Assert.Equal("refresh_token", returnValue.RefreshToken.ToString());
-        Assert.Equal(user.Id, returnValue.User.Id.ToString());
-        Assert.Equal(user.Username, returnValue.User.Username.ToString());
-        Assert.Equal(user.Email, returnValue.User.Email.ToString());
+        
+        var accessToken = returnValue.GetType().GetProperty("AccessToken")?.GetValue(returnValue)?.ToString();
+        var refreshToken = returnValue.GetType().GetProperty("RefreshToken")?.GetValue(returnValue)?.ToString();
+        var returnedUser = returnValue.GetType().GetProperty("User")?.GetValue(returnValue) as UserViewModel;
+        
+        Assert.Equal("access_token", accessToken);
+        Assert.Equal("refresh_token", refreshToken);
+        Assert.NotNull(returnedUser);
+        Assert.Equal(user.Id, returnedUser.Id);
+        Assert.Equal(user.Username, returnedUser.Username);
+        Assert.Equal(user.Email, returnedUser.Email);
     }
 
     [Fact]
@@ -112,7 +118,7 @@ public class AuthControllerTests
             Username = "testuser",
             Email = "test@example.com",
             IsDeleted = true,
-            Role = new RoleViewModel { RoleId = 1 }
+            Role = new RoleViewModel { Id = 1 }
         };
 
         _mockUserService

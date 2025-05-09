@@ -18,17 +18,17 @@ public class StatService(IUnitOfWork unitOfWork) : IStatsService
 
         var totalRevenues = getAllOrders.Sum(o => o.OrderItems.Sum(oi => oi.UnitPrice * oi.Quantity));
 
-        var allBook = await unitOfWork.BookRepository.GetAllWithIncludeAsync(b => b.IsDeleted == false, b => b.Category, b => b.ImageBooks);
+        var allBook = await unitOfWork.BookRepository.GetAllWithIncludeAsync(b => b.IsDeleted == false, b => b.Category);
 
         var topBooks = allBook
             .OrderByDescending(b => b.UpdatedDate)
             .Take(5)
             .Select(b => new BookViewModel
             {
-                BookId = b.BookId,
+                Id = b.Id,
                 Title = b.Title,
                 CategoryName = b.Category.Name,
-                ImageUrls = b.ImageBooks.Select(i => i.UrlImage).ToList(),
+                ImageUrl = b.ImageUrl,
                 Quantity = b.Quantity,
                 CreatedDate = b.CreatedDate,
                 UpdatedDate = b.UpdatedDate
@@ -37,7 +37,7 @@ public class StatService(IUnitOfWork unitOfWork) : IStatsService
             .GroupBy(b => b.CategoryId)
             .Select(g => new CategoryViewModel
             {
-                CategoryId = g.Key,
+                Id = g.Key,
                 Name = g.FirstOrDefault()!.Category.Name,
                 BookCount = g.Count()
             })

@@ -44,8 +44,8 @@ namespace Squido.Test.UnitTests.Services
             };
             var categoryViewModels = new List<CategoryViewModel>
             {
-                new() { CategoryId = 1, Name = "Category 1" },
-                new() { CategoryId = 2, Name = "Category 2" }
+                new() { Id = 1, Name = "Category 1" },
+                new() { Id = 2, Name = "Category 2" }
             };
 
             _mockCategoryRepository

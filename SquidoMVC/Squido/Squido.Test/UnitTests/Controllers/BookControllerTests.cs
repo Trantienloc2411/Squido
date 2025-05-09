@@ -31,8 +31,8 @@ public class BookControllerTests
         var pageSize = 10;
         var books = new List<BookViewModel>
         {
-            new() { BookId = "1", Title = "Book 1" },
-            new() { BookId = "2", Title = "Book 2" }
+            new() { Id = "1", Title = "Book 1" },
+            new() { Id = "2", Title = "Book 2" }
         };
 
         _mockBookService
@@ -62,8 +62,8 @@ public class BookControllerTests
         var keyword = "test";
         var books = new List<BookViewModel>
         {
-            new() { BookId = "1", Title = "Book 1" },
-            new() { BookId = "2", Title = "Book 2" }
+            new() { Id = "1", Title = "Book 1" },
+            new() { Id = "2", Title = "Book 2" }
         };
 
         _mockBookService
@@ -86,7 +86,7 @@ public class BookControllerTests
         var bookId = "1";
         var book = new Book 
         { 
-            BookId = bookId, 
+            Id = bookId, 
             Title = "Test Book",
             Author = new Author { Bio = "Test Bio" },
             Category = new Category(),
@@ -94,11 +94,16 @@ public class BookControllerTests
         };
         var bookViewModel = new BookViewModel 
         { 
-            BookId = bookId, 
+            Id = bookId, 
             Title = "Test Book"
         };
         var relatedBooks = new List<BookViewModel>();
         var categoryViewModel = new CategoryViewModel();
+        var viewBookDetailViewModel = new ViewBookDetailViewModel
+        {
+            Book = bookViewModel,
+            RatingValueAverage = 4.5
+        };
 
         _mockBookService
             .Setup(service => service.GetBookById(bookId))
@@ -113,16 +118,12 @@ public class BookControllerTests
             .Returns(bookViewModel);
 
         _mockMapper
-            .Setup(m => m.Map(book, bookViewModel))
-            .Returns(bookViewModel);
-
-        _mockMapper
             .Setup(m => m.Map<CategoryViewModel>(It.IsAny<Category>()))
             .Returns(categoryViewModel);
 
         _mockMapper
-            .Setup(m => m.Map(book.Category, categoryViewModel))
-            .Returns(categoryViewModel);
+            .Setup(m => m.Map<ViewBookDetailViewModel>(It.IsAny<Book>()))
+            .Returns(viewBookDetailViewModel);
 
         // Act
         var result = await _controller.GetBook(bookId);
@@ -131,7 +132,7 @@ public class BookControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnValue = Assert.IsType<ViewBookDetailViewModel>(okResult.Value);
         Assert.NotNull(returnValue.Book);
-        Assert.Equal(bookId, returnValue.Book!.BookId);
+        Assert.Equal(bookId, returnValue.Book.Id);
         Assert.Equal("Test Book", returnValue.Book.Title);
         Assert.Equal(4.5, returnValue.RatingValueAverage);
     }

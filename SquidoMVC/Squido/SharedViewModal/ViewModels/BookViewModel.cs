@@ -4,7 +4,7 @@ namespace SharedViewModal.ViewModels;
 
 public class BookViewModel
 {
-    public string? BookId {get;set;}
+    public string? Id {get;set;}
     public string? Title {get;set;}
     public string? CategoryName {get;set;}
     public Guid AuthorId {get;set;} 
@@ -12,7 +12,7 @@ public class BookViewModel
     public int Quantity {get;set;}
     public decimal Price {get;set;}
     public int BuyCount { get; set; }
-    public List<string>? ImageUrls { get; set; }
+    public string? ImageUrl { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
     

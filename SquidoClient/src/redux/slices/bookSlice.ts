@@ -182,6 +182,24 @@ export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: 
     const data = await response.json()
     console.log("Book API response:", data)
 
+    // Log author information specifically
+    if (data && data.book) {
+      console.log("Author information in response:", {
+        authorId: data.book.authorId,
+        authorName: data.book.authorName,
+      })
+    } else if (data && data.data && data.data.book) {
+      console.log("Author information in response.data:", {
+        authorId: data.data.book.authorId,
+        authorName: data.data.book.authorName,
+      })
+    } else if (data) {
+      console.log("Author information in direct data:", {
+        authorId: data.authorId,
+        authorName: data.authorName,
+      })
+    }
+
     // Handle different response formats
     let bookDetail
 
@@ -209,7 +227,7 @@ export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: 
     // If bookDetail doesn't have a book property, check if it is the book itself
     if (!bookDetail.book) {
       // If the response has properties that look like a book, wrap it
-      if (bookDetail.bookId || bookDetail.title) {
+      if (bookDetail.id || bookDetail.title) {
         bookDetail = { book: bookDetail }
       } else {
         console.error("Invalid response format: no book data found", bookDetail)
@@ -217,7 +235,7 @@ export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: 
       }
     }
 
-    console.log("import.metaed book detail:", bookDetail)
+    console.log("Processed book detail:", bookDetail)
     return bookDetail
   } catch (error) {
     console.error("Error fetching book:", error)
@@ -227,18 +245,33 @@ export const fetchBookById = createAsyncThunk("books/fetchBookById", async (id: 
 
 // Update the createBook function in bookSlice.ts
 
-// Create a new book
+// Also update the createBook function to match the API structure
+// Find the createBook function and replace it with this implementation:
+
 export const createBook = createAsyncThunk("books/createBook", async (bookData: any, { rejectWithValue }) => {
   try {
     console.log("Creating book with data:", bookData)
     const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:5083/api"
+
+    // Prepare the request body to match the API structure
+    const requestBody = {
+      title: bookData.title,
+      categoryId: bookData.categoryId,
+      authorId: bookData.authorId,
+      description: bookData.description,
+      quantity: bookData.quantity,
+      price: bookData.price,
+      imageUrl: bookData.imageUrl,
+    }
+
+    console.log("Request body:", requestBody)
 
     const response = await fetch(`${API_URL}/Book`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(bookData),
+      body: JSON.stringify(requestBody),
     })
 
     const responseData = await response.json()
@@ -260,7 +293,12 @@ export const createBook = createAsyncThunk("books/createBook", async (bookData: 
   }
 })
 
-// Update the updateBook function similarly
+// Update the updateBook function to match the API structure
+// Find the updateBook function and replace it with this implementation:
+
+// Find the updateBook function and check how it's handling authorId
+
+// Update the updateBook function to ensure authorId is properly included
 export const updateBook = createAsyncThunk(
   "books/updateBook",
   async ({ id, bookData }: { id: string; bookData: any }, { rejectWithValue }) => {
@@ -268,12 +306,30 @@ export const updateBook = createAsyncThunk(
       console.log("Updating book with ID:", id, "Data:", bookData)
       const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:5083/api"
 
+      // Ensure authorId is included and not null
+      if (!bookData.authorId) {
+        console.warn("Warning: authorId is null or undefined in update request")
+      }
+
+      // Prepare the request body to match the API structure
+      const requestBody = {
+        title: bookData.title,
+        categoryId: bookData.categoryId,
+        authorId: bookData.authorId || "", // Ensure it's not null
+        description: bookData.description,
+        quantity: bookData.quantity,
+        price: bookData.price,
+        imageUrl: bookData.imageUrl,
+      }
+
+      console.log("Request body:", requestBody)
+
       const response = await fetch(`${API_URL}/Book/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(bookData),
+        body: JSON.stringify(requestBody),
       })
 
       const responseData = await response.json()
@@ -422,11 +478,11 @@ const bookSlice = createSlice({
 
       // Update book
       .addCase(updateBook.fulfilled, (state, action: PayloadAction<Book>) => {
-        const index = state.books.findIndex((book) => book.bookId === action.payload.bookId)
+        const index = state.books.findIndex((book) => book.id === action.payload.id)
         if (index !== -1) {
           state.books[index] = action.payload
         }
-        if (state.currentBook?.bookId === action.payload.bookId) {
+        if (state.currentBook?.id === action.payload.id) {
           state.currentBook = action.payload
         }
       })
@@ -436,8 +492,8 @@ const bookSlice = createSlice({
 
       // Delete book
       .addCase(deleteBook.fulfilled, (state, action: PayloadAction<string>) => {
-        state.books = state.books.filter((book) => book.bookId !== action.payload)
-        if (state.currentBook?.bookId === action.payload) {
+        state.books = state.books.filter((book) => book.id !== action.payload)
+        if (state.currentBook?.id === action.payload) {
           state.currentBook = null
         }
       })

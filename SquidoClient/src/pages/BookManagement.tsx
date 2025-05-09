@@ -170,7 +170,7 @@ const BookManagement: React.FC = () => {
                       <option value="">Loading categories...</option>
                     ) : (
                       categories.map((cat) => (
-                        <option key={cat.categoryId} value={cat.categoryId.toString()}>
+                        <option key={cat.id} value={cat.id.toString()}>
                           {cat.name}
                         </option>
                       ))

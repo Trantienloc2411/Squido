@@ -84,7 +84,7 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading, pagination, searc
 
     setIsDeleting(true)
     try {
-      await dispatch(deleteBook(bookToDelete.bookId))
+      await dispatch(deleteBook(bookToDelete.id)) // Changed from bookId to id
       toast({
         title: "Book deleted",
         description: `"${bookToDelete.title}" has been deleted successfully.`,
@@ -157,11 +157,13 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading, pagination, searc
             </Thead>
             <Tbody>
               {books.map((book) => (
-                <Tr key={book.bookId}>
+                <Tr key={book.id}>
+                  {" "}
+                  {/* Changed from bookId to id */}
                   <Td>
                     <Flex align="center">
                       <Image
-                        src={book.imageUrls?.[0] || "/placeholder.svg?height=40&width=30&query=book"}
+                        src={book.imageUrl || "/placeholder.svg?height=40&width=30&query=book"}
                         alt={book.title}
                         boxSize="40px"
                         objectFit="cover"
@@ -173,7 +175,7 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading, pagination, searc
                           {book.title}
                         </Text>
                         <Text fontSize="xs" color="gray.500">
-                          ID: {book.bookId}
+                          ID: {book.id} {/* Changed from bookId to id */}
                         </Text>
                       </Box>
                     </Flex>
@@ -197,7 +199,9 @@ const BookList: React.FC<BookListProps> = ({ books, isLoading, pagination, searc
                         aria-label="Options"
                       />
                       <MenuList>
-                        <MenuItem icon={<FiEye />} onClick={() => handleView(book.bookId)}>
+                        <MenuItem icon={<FiEye />} onClick={() => handleView(book.id)}>
+                          {" "}
+                          {/* Changed from bookId to id */}
                           View Details
                         </MenuItem>
                         <MenuItem icon={<FiEdit />} onClick={() => handleEdit(book)}>

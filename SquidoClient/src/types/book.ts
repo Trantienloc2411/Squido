@@ -1,5 +1,5 @@
 export interface Book {
-  bookId: string
+  id: string // Changed from bookId
   title: string
   categoryName: string
   authorName: string | null
@@ -7,7 +7,7 @@ export interface Book {
   quantity: number
   price: number
   buyCount: number
-  imageUrls: string[] | null
+  imageUrl: string | null
   createdDate: string
   updatedDate: string | null
 }
@@ -28,7 +28,7 @@ export interface BookParams {
 }
 
 export interface Category {
-  categoryId: number
+  id: number // Changed from categoryId
   name: string
   description: string | null
   bookCount: number | null

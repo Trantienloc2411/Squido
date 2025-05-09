@@ -36,6 +36,9 @@ public class OrderControllerTests
             new()
             {
                 BookId = Guid.NewGuid().ToString(),
+                Title = "Test Book",
+                AuthorName = "Test Author",
+                CategoryName = "Test Category",
                 Quantity = 1,
                 UnitPrice = 100.00m
             }
@@ -49,9 +52,16 @@ public class OrderControllerTests
             {
                 Id = Guid.NewGuid().ToString(),
                 OrderDate = order.OrderDate,
-                Status = (OrderStatusEnum)order.Status,
-                PaymentMethod = (PaymentMethod)order.PaymentMethod,
+                Status = order.Status.Value,
+                PaymentMethod = PaymentMethod.Credit,
                 OrderNote = order.OrderNote,
+                UserViewModel = new UserViewModel
+                {
+                    Id = order.CustomerId.ToString(),
+                    Email = "test@example.com",
+                    FirstName = "Test",
+                    LastName = "User"
+                },
                 OrderItemViewModels = orderItems
             }
         };
@@ -67,9 +77,11 @@ public class OrderControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnValue = Assert.IsType<OrderResultViewModel>(okResult.Value);
         Assert.Equal(order.OrderDate, returnValue.OrderDate);
-        Assert.Equal((OrderStatusEnum)order.Status, returnValue.Status);
-        Assert.Equal((PaymentMethod)order.PaymentMethod, returnValue.PaymentMethod);
+        Assert.Equal(order.Status, returnValue.Status);
+        Assert.Equal(PaymentMethod.Credit, returnValue.PaymentMethod);
         Assert.Equal(order.OrderNote, returnValue.OrderNote);
+        Assert.NotNull(returnValue.UserViewModel);
+        Assert.Equal(order.CustomerId.ToString(), returnValue.UserViewModel.Id);
     }
 
     [Fact]
@@ -124,6 +136,9 @@ public class OrderControllerTests
             new()
             {
                 BookId = Guid.NewGuid().ToString(),
+                Title = "Test Book",
+                AuthorName = "Test Author",
+                CategoryName = "Test Category",
                 Quantity = 1,
                 UnitPrice = 100.00m
             }
