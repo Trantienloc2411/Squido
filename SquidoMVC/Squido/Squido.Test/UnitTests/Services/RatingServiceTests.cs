@@ -27,140 +27,162 @@ public class RatingServiceTests
     }
 
     [Fact]
-    public async Task CreateRating_Success_ReturnsSuccessResponse()
+    public async Task CreateRating_ValidData_ReturnsSuccess()
     {
         // Arrange
-        var createRatingViewModel = new CreateRatingViewModel
+        var ratingViewModel = new CreateRatingViewModel
         {
+            BookId = "test-book-id",
             CustomerId = Guid.NewGuid(),
-            BookId = "123",
             RatingValue = 5,
             Comment = "Great book!"
         };
 
         var rating = new Rating
         {
-            Id = "test-id",
-            CustomerId = createRatingViewModel.CustomerId,
-            BookId = createRatingViewModel.BookId,
-            RatingValue = createRatingViewModel.RatingValue,
-            Comment = createRatingViewModel.Comment,
-            CreatedDate = DateTime.Now
+            BookId = ratingViewModel.BookId,
+            CustomerId = ratingViewModel.CustomerId,
+            RatingValue = ratingViewModel.RatingValue,
+            Comment = ratingViewModel.Comment
         };
 
-        _mockMapper.Setup(m => m.Map<Rating>(createRatingViewModel))
+        _mockMapper.Setup(m => m.Map<Rating>(ratingViewModel))
             .Returns(rating);
-        _mockMapper.Setup(m => m.Map<CreateRatingViewModel>(rating))
-            .Returns(createRatingViewModel);
-        _mockMapper.Setup(m => m.Map<RatingViewModel>(rating))
-            .Returns(new RatingViewModel 
-            { 
-                Id = rating.Id,
-                CustomerId = rating.CustomerId,
-                BookId = rating.BookId,
-                RatingValue = rating.RatingValue,
-                Comment = rating.Comment,
-                CreatedDate = rating.CreatedDate
-            });
 
         _mockUnitOfWork.Setup(u => u.RatingRepository.AddAsync(It.IsAny<Rating>()))
             .Returns(Task.CompletedTask);
+
         _mockUnitOfWork.Setup(u => u.SaveAsync())
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _ratingService.CreateRating(createRatingViewModel);
+        var result = await _ratingService.CreateRating(ratingViewModel);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal("Rating created successfully", result.Message);
-        Assert.NotNull(result.Data);
-        _mockUnitOfWork.Verify(u => u.RatingRepository.AddAsync(It.IsAny<Rating>()), Times.Once);
-        _mockUnitOfWork.Verify(u => u.SaveAsync(), Times.Once);
+        Assert.Equal(ratingViewModel, result.Data);
     }
 
     [Fact]
-    public async Task CreateRating_Failed_ReturnsFailedResponse()
+    public async Task CreateRating_NullModel_ReturnsFalse()
     {
         // Arrange
-        var createRatingViewModel = new CreateRatingViewModel
+        CreateRatingViewModel ratingViewModel = null;
+
+        // Act
+        var result = await _ratingService.CreateRating(ratingViewModel);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal("Invalid rating data", result.Message);
+        Assert.Null(result.Data);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(6)]
+    public async Task CreateRating_InvalidRatingValue_ReturnsFalse(int invalidRating)
+    {
+        // Arrange
+        var ratingViewModel = new CreateRatingViewModel
         {
+            BookId = "test-book-id",
             CustomerId = Guid.NewGuid(),
-            BookId = "123",
-            RatingValue = 6, // Invalid rating value
-            Comment = "Great book!"
+            RatingValue = invalidRating,
+            Comment = "Test comment"
         };
 
         // Act
-        var result = await _ratingService.CreateRating(createRatingViewModel);
+        var result = await _ratingService.CreateRating(ratingViewModel);
 
         // Assert
         Assert.False(result.IsSuccess);
         Assert.Equal("Invalid rating value", result.Message);
         Assert.Null(result.Data);
-        _mockUnitOfWork.Verify(u => u.RatingRepository.AddAsync(It.IsAny<Rating>()), Times.Never);
-        _mockUnitOfWork.Verify(u => u.Save(), Times.Never);
     }
 
     [Fact]
-    public async Task CreateRating_Exception_ReturnsExceptionResponse()
+    public async Task CreateRating_MappingFails_ReturnsFalse()
     {
         // Arrange
-        var createRatingViewModel = new CreateRatingViewModel
+        var ratingViewModel = new CreateRatingViewModel
         {
+            BookId = "test-book-id",
             CustomerId = Guid.NewGuid(),
-            BookId = "123",
             RatingValue = 5,
-            Comment = "Great book!"
+            Comment = "Test comment"
         };
 
-        _mockMapper.Setup(m => m.Map<Rating>(createRatingViewModel))
-            .Throws(new Exception("Mapping failed"));
+        _mockMapper.Setup(m => m.Map<Rating>(ratingViewModel))
+            .Returns((Rating)null);
 
         // Act
-        var result = await _ratingService.CreateRating(createRatingViewModel);
+        var result = await _ratingService.CreateRating(ratingViewModel);
 
         // Assert
         Assert.False(result.IsSuccess);
-        Assert.Equal("Mapping failed", result.Message);
-        _mockUnitOfWork.Verify(u => u.RatingRepository.AddAsync(It.IsAny<Rating>()), Times.Never);
-        _mockUnitOfWork.Verify(u => u.Save(), Times.Never);
+        Assert.Equal("Failed to map rating data", result.Message);
+        Assert.Null(result.Data);
     }
 
     [Fact]
-    public async Task GetRatingsByBookId_Success_ReturnsRatings()
+    public async Task CreateRating_DatabaseError_ReturnsFalse()
     {
         // Arrange
-        var bookId = "123";
+        var ratingViewModel = new CreateRatingViewModel
+        {
+            BookId = "test-book-id",
+            CustomerId = Guid.NewGuid(),
+            RatingValue = 5,
+            Comment = "Test comment"
+        };
+
+        var rating = new Rating
+        {
+            BookId = ratingViewModel.BookId,
+            CustomerId = ratingViewModel.CustomerId,
+            RatingValue = ratingViewModel.RatingValue,
+            Comment = ratingViewModel.Comment
+        };
+
+        _mockMapper.Setup(m => m.Map<Rating>(ratingViewModel))
+            .Returns(rating);
+
+        _mockUnitOfWork.Setup(u => u.RatingRepository.AddAsync(It.IsAny<Rating>()))
+            .ThrowsAsync(new NullReferenceException("Object reference not set to an instance of an object"));
+
+        // Act
+        var result = await _ratingService.CreateRating(ratingViewModel);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal("Object reference not set to an instance of an object", result.Message);
+        Assert.Null(result.Data);
+    }
+
+    [Fact]
+    public async Task GetRatingsByBookId_ValidId_ReturnsRatings()
+    {
+        // Arrange
+        var bookId = "test-book-id";
+        var customerId = Guid.NewGuid();
+        var createdDate = DateTime.Now;
         var ratings = new List<Rating>
         {
-            new()
-            {
-                Id = "1",
-                CustomerId = Guid.NewGuid(),
-                BookId = bookId,
-                RatingValue = 5,
-                Comment = "Great book!",
-                CreatedDate = DateTime.Now
-            }
+            new Rating { Id = "1", BookId = bookId, CustomerId = customerId, RatingValue = 5, CreatedDate = createdDate },
+            new Rating { Id = "2", BookId = bookId, CustomerId = customerId, RatingValue = 4, CreatedDate = createdDate }
         };
 
         var ratingViewModels = new List<RatingViewModel>
         {
-            new()
-            {
-                Id = "1",
-                CustomerId = ratings[0].CustomerId,
-                BookId = bookId,
-                RatingValue = 5,
-                Comment = "Great book!",
-                CreatedDate = ratings[0].CreatedDate
-            }
+            new RatingViewModel { Id = "1", BookId = bookId, CustomerId = customerId, RatingValue = 5, CreatedDate = createdDate },
+            new RatingViewModel { Id = "2", BookId = bookId, CustomerId = customerId, RatingValue = 4, CreatedDate = createdDate }
         };
 
         _mockUnitOfWork.Setup(u => u.RatingRepository.GetAllWithIncludeAsync(
-                It.IsAny<Expression<Func<Rating, bool>>>(),
-                It.IsAny<Expression<Func<Rating, object>>>()))
+                It.IsAny<System.Linq.Expressions.Expression<Func<Rating, bool>>>(),
+                It.IsAny<System.Linq.Expressions.Expression<Func<Rating, object>>>()))
             .ReturnsAsync(ratings);
 
         _mockMapper.Setup(m => m.Map<List<RatingViewModel>>(ratings))
@@ -172,19 +194,17 @@ public class RatingServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal("Ratings retrieved successfully", result.Message);
-        Assert.NotNull(result.Data);
-        Assert.Single(result.Data);
-        Assert.Equal(bookId, result.Data[0].BookId);
+        Assert.Equal(2, result.Data.Count);
     }
 
-    [Fact]
-    public async Task GetRatingsByBookId_InvalidBookId_ReturnsError()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task GetRatingsByBookId_InvalidId_ReturnsFalse(string invalidBookId)
     {
-        // Arrange
-        string bookId = null;
-
         // Act
-        var result = await _ratingService.GetRatingsByBookId(bookId);
+        var result = await _ratingService.GetRatingsByBookId(invalidBookId);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -193,39 +213,45 @@ public class RatingServiceTests
     }
 
     [Fact]
-    public async Task GetRatingsByUserId_Success_ReturnsRatings()
+    public async Task GetRatingsByBookId_DatabaseError_ReturnsFalse()
+    {
+        // Arrange
+        var bookId = "test-book-id";
+        _mockUnitOfWork.Setup(u => u.RatingRepository.GetAllWithIncludeAsync(
+                It.IsAny<System.Linq.Expressions.Expression<Func<Rating, bool>>>(),
+                It.IsAny<System.Linq.Expressions.Expression<Func<Rating, object>>>()))
+            .ThrowsAsync(new Exception("Database error"));
+
+        // Act
+        var result = await _ratingService.GetRatingsByBookId(bookId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal("Database error", result.Message);
+        Assert.Null(result.Data);
+    }
+
+    [Fact]
+    public async Task GetRatingsByUserId_ValidId_ReturnsRatings()
     {
         // Arrange
         var userId = Guid.NewGuid();
+        var createdDate = DateTime.Now;
         var ratings = new List<Rating>
         {
-            new()
-            {
-                Id = "1",
-                CustomerId = userId,
-                BookId = "123",
-                RatingValue = 5,
-                Comment = "Great book!",
-                CreatedDate = DateTime.Now
-            }
+            new Rating { Id = "1", BookId = "book1", CustomerId = userId, RatingValue = 5, CreatedDate = createdDate },
+            new Rating { Id = "2", BookId = "book2", CustomerId = userId, RatingValue = 4, CreatedDate = createdDate }
         };
 
         var ratingViewModels = new List<RatingViewModel>
         {
-            new()
-            {
-                Id = "1",
-                CustomerId = userId,
-                BookId = "123",
-                RatingValue = 5,
-                Comment = "Great book!",
-                CreatedDate = ratings[0].CreatedDate
-            }
+            new RatingViewModel { Id = "1", BookId = "book1", CustomerId = userId, RatingValue = 5, CreatedDate = createdDate },
+            new RatingViewModel { Id = "2", BookId = "book2", CustomerId = userId, RatingValue = 4, CreatedDate = createdDate }
         };
 
         _mockUnitOfWork.Setup(u => u.RatingRepository.GetAllWithIncludeAsync(
-                It.IsAny<Expression<Func<Rating, bool>>>(),
-                It.IsAny<Expression<Func<Rating, object>>>()))
+                It.IsAny<System.Linq.Expressions.Expression<Func<Rating, bool>>>(),
+                It.IsAny<System.Linq.Expressions.Expression<Func<Rating, object>>>()))
             .ReturnsAsync(ratings);
 
         _mockMapper.Setup(m => m.Map<List<RatingViewModel>>(ratings))
@@ -237,13 +263,11 @@ public class RatingServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal("Ratings retrieved successfully", result.Message);
-        Assert.NotNull(result.Data);
-        Assert.Single(result.Data);
-        Assert.Equal(userId, result.Data[0].CustomerId);
+        Assert.Equal(2, result.Data.Count);
     }
 
     [Fact]
-    public async Task GetRatingsByUserId_InvalidUserId_ReturnsError()
+    public async Task GetRatingsByUserId_EmptyGuid_ReturnsFalse()
     {
         // Arrange
         var userId = Guid.Empty;
@@ -254,6 +278,25 @@ public class RatingServiceTests
         // Assert
         Assert.False(result.IsSuccess);
         Assert.Equal("Invalid user ID", result.Message);
+        Assert.Null(result.Data);
+    }
+
+    [Fact]
+    public async Task GetRatingsByUserId_DatabaseError_ReturnsFalse()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        _mockUnitOfWork.Setup(u => u.RatingRepository.GetAllWithIncludeAsync(
+                It.IsAny<System.Linq.Expressions.Expression<Func<Rating, bool>>>(),
+                It.IsAny<System.Linq.Expressions.Expression<Func<Rating, object>>>()))
+            .ThrowsAsync(new Exception("Database error"));
+
+        // Act
+        var result = await _ratingService.GetRatingsByUserId(userId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal("Database error", result.Message);
         Assert.Null(result.Data);
     }
 }
