@@ -7,7 +7,7 @@ public interface IJwtService
 {
     string GenerateToken(string userId, string username, int RoleId);
     RefreshToken? GenerateRefreshToken(Guid userId);
-    Task<bool> ValidateRefreshTokenAsync(string token, string userId);
+    Task<bool> ValidateRefreshTokenAsync(string token, Guid userId);
     Task<RefreshToken?> GetValidRefreshTokenAsync(string token, Guid userId);
     Task RevokeRefreshTokenAsync(string token);
     ClaimsPrincipal ValidateAccessToken(string token);

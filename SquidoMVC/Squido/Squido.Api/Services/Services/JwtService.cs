@@ -61,10 +61,10 @@ public class JwtService : IJwtService
         return refreshToken;
     }
 
-    public async Task<bool> ValidateRefreshTokenAsync(string token, string userId)
+    public async Task<bool> ValidateRefreshTokenAsync(string token, Guid userId)
     {
         var storedToken = await uoW.RefreshTokenRepository
-            .GetSingleWithIncludeAsync(c => c.Token == token && c.UserId.ToString() == userId);
+            .GetSingleWithIncludeAsync(c => c.Token == token && c.UserId == userId);
         if (storedToken == null || storedToken.IsExpired) return false;
         return true;
     }
@@ -94,7 +94,12 @@ public class JwtService : IJwtService
 
     public ClaimsPrincipal ValidateAccessToken(string token)
     {
-        var tokenValidatrionParameter = new TokenValidationParameters
+        if (string.IsNullOrEmpty(token))
+        {
+            throw new ArgumentNullException(nameof(token), "The parameter 'token' cannot be a 'null' or an empty object.");
+        }
+
+        var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -106,7 +111,21 @@ public class JwtService : IJwtService
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var principal = tokenHandler.ValidateToken(token, tokenValidatrionParameter, out var securityToken);
-        return principal;
+        try
+        {
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenMalformedException("Invalid token format");
+            }
+
+            return principal;
+        }
+        catch (Exception ex)
+        {
+            throw new SecurityTokenMalformedException("Invalid token format", ex);
+        }
     }
 }

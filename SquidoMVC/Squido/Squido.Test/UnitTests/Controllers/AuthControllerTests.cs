@@ -60,13 +60,11 @@ public class AuthControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnValue = okResult.Value as dynamic;
-        Assert.NotNull(returnValue);
-        
-        var accessToken = returnValue.GetType().GetProperty("AccessToken")?.GetValue(returnValue)?.ToString();
-        var refreshToken = returnValue.GetType().GetProperty("RefreshToken")?.GetValue(returnValue)?.ToString();
-        var returnedUser = returnValue.GetType().GetProperty("User")?.GetValue(returnValue) as UserViewModel;
-        
+        var returnValue = okResult.Value;
+        var type = returnValue.GetType();
+        var accessToken = (string)type.GetProperty("accessToken")!.GetValue(returnValue)!;
+        var refreshToken = (string)type.GetProperty("refreshToken")!.GetValue(returnValue)!;
+        var returnedUser = (UserViewModel)type.GetProperty("user")!.GetValue(returnValue)!;
         Assert.Equal("access_token", accessToken);
         Assert.Equal("refresh_token", refreshToken);
         Assert.NotNull(returnedUser);

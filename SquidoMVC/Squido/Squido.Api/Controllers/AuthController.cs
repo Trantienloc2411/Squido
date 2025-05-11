@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using SharedViewModal.RequestViewModal;
 using SharedViewModal.ViewModels;
+using WebApplication1.Models.RequestViewModal;
 using WebApplication1.Services.Interfaces;
 using WebApplication1.Services.Services;
 
@@ -49,23 +50,77 @@ public class AuthController : ControllerBase
                 string accessToken = jwtService.GenerateToken(user.Id!.ToString(), user!.Username!, roles);
                 var refreshToken = jwtService.GenerateRefreshToken(Guid.Parse(user.Id!.ToString()));
 
-                // Return tokens along with user info if needed
                 return Ok(new
                 {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken!.Token,
-                    User = user
+                    accessToken,
+                    refreshToken = refreshToken.Token,
+                    user
                 });
             }
-            else
-            {
-                return BadRequest("Email or password is incorrect");
-            }
+
+            return BadRequest("Invalid request");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.WriteLine(e);
-            return StatusCode(500, "An error occurred during login");
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(request.RefreshToken) || string.IsNullOrEmpty(request.UserId))
+            {
+                return BadRequest("Invalid request");
+            }
+
+            var userId = Guid.Parse(request.UserId);
+            var isValid = await jwtService.ValidateRefreshTokenAsync(request.RefreshToken, userId);
+
+            if (!isValid)
+            {
+                return Unauthorized("Invalid refresh token");
+            }
+
+            var user = await userService.GetUserByIdAsync(userId);
+            if (user.Data == null)
+            {
+                return Unauthorized("User not found");
+            }
+
+            var accessToken = jwtService.GenerateToken(user.Data.Id!.ToString(), user.Data.Username!, user.Data.Role!.Id);
+            var newRefreshToken = jwtService.GenerateRefreshToken(userId);
+
+            return Ok(new
+            {
+                accessToken,
+                refreshToken = newRefreshToken.Token
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpPost("revoke-token")]
+    public async Task<IActionResult> RevokeToken([FromBody] RefreshTokenRequest request)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(request.RefreshToken))
+            {
+                return BadRequest("Invalid request");
+            }
+
+            await jwtService.RevokeRefreshTokenAsync(request.RefreshToken);
+            return Ok("Token revoked successfully");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
         }
     }
 
@@ -87,7 +142,4 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-
-
-
 }
