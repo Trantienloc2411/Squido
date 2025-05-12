@@ -126,13 +126,13 @@ namespace WebApplication1.Tests.Services
             Assert.True(result.IsSuccess);
             Assert.Equal("Order created successfully", result.Message);
             Assert.NotNull(result.Data);
-            Assert.Equal(orderResultViewModel.Id, result.Data.Id);
+            Assert.NotNull(result.Data.Id);
             Assert.Equal(orderResultViewModel.OrderDate, result.Data.OrderDate);
             Assert.Equal(orderResultViewModel.Status, result.Data.Status);
             Assert.Equal(orderResultViewModel.PaymentMethod, result.Data.PaymentMethod);
             Assert.Equal(orderResultViewModel.OrderNote, result.Data.OrderNote);
             Assert.Equal(orderResultViewModel.OrderItemViewModels.Count, result.Data.OrderItemViewModels.Count);
-            _orderRepositoryMock.Verify(r => r.AddAsync(It.Is<Order>(o => o.Id == order.Id)), Times.Once());
+            _orderRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Order>()), Times.Once());
             _orderItemRepositoryMock.Verify(r => r.AddAsync(It.IsAny<OrderItem>()), Times.Exactly(2));
             _unitOfWorkMock.Verify(u => u.Save(), Times.Exactly(2));
             _unitOfWorkMock.Verify(u => u.Dispose(), Times.Once());

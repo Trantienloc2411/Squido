@@ -12,7 +12,7 @@ public class OrderItem
         
     public string BookId { get; set; }
 
-    public string Title {get;set;}
+    public string Title { get; set; }
     public string AuthorName { get; set; }
     public string CategoryName { get; set; }
         
@@ -25,5 +25,4 @@ public class OrderItem
         
     [ForeignKey("BookId")]
     public Book Book { get; set; }
-    
 }

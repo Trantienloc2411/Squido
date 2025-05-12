@@ -32,7 +32,7 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
                 {
                     CurrentPage = page.Value,
                     PageCount = pageCount,
-                    Data = (List<BookViewModel>)paginatedBooks,
+                    Data = paginatedBooks.ToList(),
                     TotalCount = booksCount,
                 };
 
@@ -63,22 +63,18 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
             {
                 return NotFound();
             }
+
+            if (book.AuthorId == Guid.Empty)
+            {
+                return BadRequest("Invalid author ID");
+            }
+
             var bookRelated = await bookService.GetBookByAuthorId(book.AuthorId.ToString(), bookId);
             var listBookRelated = bookRelated.ToList();
-            var bookViewModel = new BookViewModel();
-            var categoryViewModel = new CategoryViewModel();
             
-            var bookResult = mapper.Map(book, bookViewModel);
-            var categoryResult = mapper.Map(book.Category, categoryViewModel);
-            var details = new ViewBookDetailViewModel
-            {
-                Book = bookResult,
-                Category = categoryResult,
-                Bio = book.Author.Bio,
-                RatingValueAverage = 4.5,
-                BookDescription = book.Description,
-                BookRelated = listBookRelated,
-            };
+            var details = mapper.Map<ViewBookDetailViewModel>(book);
+            details.BookRelated = listBookRelated;
+            details.RatingValueAverage = 4.5;
 
             return Ok(details);
         }
@@ -105,7 +101,7 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
             }
 
             var filteredBooks = string.IsNullOrWhiteSpace(categoryIds)
-                ? await bookService.GetBooks() // <-- you need this method in your service
+                ? await bookService.GetBooks()
                 : await bookService.GetBooksByCategoryId(ids);
 
             if (page.HasValue)
@@ -147,10 +143,15 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
     {
         try
         {
-            var result = await bookService.CreateBook(bookViewModel);
-            if (result.IsSuccess)
+            if (bookViewModel == null)
             {
-                return CreatedAtAction(nameof(GetBook), new { id = result!.Data!.Id }, result);
+                return BadRequest("Invalid book data");
+            }
+
+            var result = await bookService.CreateBook(bookViewModel);
+            if (result.IsSuccess && result.Data != null)
+            {
+                return CreatedAtAction(nameof(GetBook), new { id = result.Data.Id }, result);
             }
             return BadRequest(result);
         }
@@ -166,6 +167,11 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
     {
         try
         {
+            if (bookViewModel == null)
+            {
+                return BadRequest("Invalid book data");
+            }
+
             var result = await bookService.UpdateBook(bookId, bookViewModel);
             if (result.IsSuccess)
             {
@@ -181,10 +187,15 @@ public class BookController(IBookService bookService, IMapper mapper) : Controll
     }
 
     [HttpDelete("api/Book/{id}")]
-    public async Task<IActionResult> DeleteBook([FromRoute (Name = "id")]string id)
+    public async Task<IActionResult> DeleteBook([FromRoute(Name = "id")] string id)
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest("Invalid book ID");
+            }
+
             var result = await bookService.DeleteBook(id);
             if (result.IsSuccess) return Ok(result.IsSuccess);
             else return BadRequest(result.Message);
