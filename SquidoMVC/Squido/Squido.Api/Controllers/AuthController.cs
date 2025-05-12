@@ -9,17 +9,8 @@ using WebApplication1.Services.Services;
 namespace WebApplication1.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController(IJwtService jwtService, IUserService userService) : ControllerBase
 {
-    private readonly IJwtService jwtService;
-    private readonly IUserService userService;
-
-    public AuthController(IJwtService jwtService, IUserService userService)
-    {
-        this.jwtService = jwtService;
-        this.userService = userService;
-    }
-
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {

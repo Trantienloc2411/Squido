@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WebApplication1.DAOs.Interfaces;
 using WebApplication1.Models.Entities;
@@ -19,6 +20,9 @@ public class JwtServiceTests
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly Mock<IConfiguration> _mockConfiguration;
     private readonly JwtService _jwtService;
+    private readonly string _secretKey = "your-512-bit-secret-key-here-minimum-64-characters-long-to-support-hmac-sha512-algorithm";
+    private readonly string _issuer = "test-issuer";
+    private readonly string _audience = "test-audience";
 
     public JwtServiceTests()
     {
@@ -26,14 +30,19 @@ public class JwtServiceTests
         _mockConfiguration = new Mock<IConfiguration>();
 
         // Setup configuration values
-        _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("your-256-bit-secret-key-here-minimum-32-characters");
-        _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("test-issuer");
-        _mockConfiguration.Setup(c => c["Jwt:Audience"]).Returns("test-audience");
+        _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns(_secretKey);
+        _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns(_issuer);
+        _mockConfiguration.Setup(c => c["Jwt:Audience"]).Returns(_audience);
         _mockConfiguration.Setup(c => c["Jwt:ExpiryInMiunte"]).Returns("60");
+
+        // Setup RefreshTokenRepository
+        var mockRefreshTokenRepo = new Mock<IGenericRepository<RefreshToken>>();
+        _mockUnitOfWork.SetupGet(u => u.RefreshTokenRepository).Returns(mockRefreshTokenRepo.Object);
 
         _jwtService = new JwtService(_mockUnitOfWork.Object, _mockConfiguration.Object);
     }
 
+    // Existing tests (unchanged)
     [Fact]
     public void GenerateToken_ValidInput_ReturnsValidToken()
     {
@@ -56,7 +65,7 @@ public class JwtServiceTests
         Assert.Equal("test-issuer", jwtToken.Issuer);
         Assert.Equal("test-audience", jwtToken.Audiences.First());
     }
-    
+
     [Fact]
     public void GenerateToken_NullInput_ThrowsArgumentNullException()
     {
@@ -65,7 +74,7 @@ public class JwtServiceTests
         string username = "test-user";
         int roleId = 1;
 
-        // Act & Assert - remove assertion on the message content since it differs
+        // Act & Assert
         Assert.Throws<ArgumentNullException>(() => _jwtService.GenerateToken(userId, username, roleId));
     }
 
@@ -89,14 +98,14 @@ public class JwtServiceTests
         _mockUnitOfWork.Verify(u => u.RefreshTokenRepository.Insert(It.IsAny<RefreshToken>()), Times.Once);
         _mockUnitOfWork.Verify(u => u.Save(), Times.Once);
     }
-    
+
     [Fact]
     public void GenerateRefreshToken_EmptyGuid_ThrowsArgumentException()
     {
         // Arrange
         var userId = Guid.Empty;
 
-        // Act & Assert - Change to expect NullReferenceException based on the actual implementation
+        // Act & Assert
         Assert.Throws<NullReferenceException>(() => _jwtService.GenerateRefreshToken(userId));
     }
 
@@ -167,7 +176,7 @@ public class JwtServiceTests
         // Assert
         Assert.False(result);
     }
-    
+
     [Fact]
     public async Task ValidateRefreshToken_EmptyToken_ReturnsFalse()
     {
@@ -175,20 +184,17 @@ public class JwtServiceTests
         var token = "";
         var userId = Guid.NewGuid();
 
-        // Prevent the call from reaching the actual method by returning null safely
         _mockUnitOfWork.Setup(u => u.RefreshTokenRepository.GetSingleWithIncludeAsync(
                 It.IsAny<System.Linq.Expressions.Expression<Func<RefreshToken, bool>>>()))
-            .ReturnsAsync((RefreshToken?)null); // Fixed nullability issue
+            .ReturnsAsync((RefreshToken)null);
 
         // Act
-        var result = string.IsNullOrEmpty(token)
-            ? false
-            : await _jwtService.ValidateRefreshTokenAsync(token, userId);
+        var result = await _jwtService.ValidateRefreshTokenAsync(token, userId);
 
         // Assert
         Assert.False(result);
     }
-    
+
     [Fact]
     public async Task ValidateRefreshToken_MismatchedUserId_ReturnsFalse()
     {
@@ -204,19 +210,21 @@ public class JwtServiceTests
             Expires = DateTime.Now.AddDays(7)
         };
 
-        // The issue is likely that the implementation doesn't check userId matching
-        // So we need to modify our setup to match what the implementation is actually doing
+        // Mock the repository to return null when UserId doesn't match
         _mockUnitOfWork.Setup(u => u.RefreshTokenRepository.GetSingleWithIncludeAsync(
-                It.IsAny<System.Linq.Expressions.Expression<Func<RefreshToken, bool>>>()))
+                It.Is<Expression<Func<RefreshToken, bool>>>(expr => !expr.Compile()(refreshToken))))
+            .ReturnsAsync((RefreshToken)null);
+
+        // Mock the repository to return the token when UserId matches
+        _mockUnitOfWork.Setup(u => u.RefreshTokenRepository.GetSingleWithIncludeAsync(
+                It.Is<Expression<Func<RefreshToken, bool>>>(expr => expr.Compile()(refreshToken))))
             .ReturnsAsync(refreshToken);
 
-        // Add a manual check to make the test pass based on actual behavior
-        bool userIdMatches = userId == refreshToken.UserId;
-        bool tokenExpired = refreshToken.Expires < DateTime.Now;
+        // Act
+        var result = await _jwtService.ValidateRefreshTokenAsync(token, userId);
 
-        // Act & Assert
-        // Skipping the actual method call to avoid the discrepancy
-        Assert.False(userIdMatches && !tokenExpired);
+        // Assert
+        Assert.False(result);
     }
 
     [Fact]
@@ -270,7 +278,7 @@ public class JwtServiceTests
         // Assert
         Assert.Null(result);
     }
-    
+
     [Fact]
     public async Task GetValidRefreshToken_NullToken_ReturnsNull()
     {
@@ -278,11 +286,28 @@ public class JwtServiceTests
         string token = null;
         var userId = Guid.NewGuid();
 
-        // Skip the actual call that causes NullReferenceException
-        // Act & Assert
-        Assert.Null(token);
+        // Mock RefreshTokenRepository
+        var mockRefreshTokenRepo = new Mock<IGenericRepository<RefreshToken>>();
+        mockRefreshTokenRepo.Setup(r => r.GetSingleWithIncludeAsync(
+                It.IsAny<Expression<Func<RefreshToken, bool>>>(),
+                It.IsAny<Expression<Func<RefreshToken, object>>[]>()))!
+            .ReturnsAsync((RefreshToken)null)
+            .Verifiable();
+
+        // Setup IUnitOfWork to return the mocked RefreshTokenRepository
+        _mockUnitOfWork.SetupGet(u => u.RefreshTokenRepository)
+            .Returns(mockRefreshTokenRepo.Object);
+
+        // Act
+        var result = await _jwtService.GetValidRefreshTokenAsync(token, userId);
+
+        // Assert
+        Assert.Null(result);
+        mockRefreshTokenRepo.Verify(r => r.GetSingleWithIncludeAsync(
+            It.IsAny<Expression<Func<RefreshToken, bool>>>(),
+            It.IsAny<Expression<Func<RefreshToken, object>>[]>()), Times.Never());
     }
-    
+
     [Fact]
     public async Task GetValidRefreshToken_WrongUserId_ReturnsNull()
     {
@@ -298,13 +323,17 @@ public class JwtServiceTests
             Expires = DateTime.Now.AddDays(7)
         };
 
-        // The issue is that the implementation doesn't check the userId correctly
-        // We'll modify our test to handle the actual behavior
-
-        // For this specific test, mock to return null when retrieving with our test conditions
+        // Mock the repository to return null when the UserId doesn't match
         _mockUnitOfWork.Setup(u => u.RefreshTokenRepository.GetSingleWithIncludeAsync(
-                It.IsAny<System.Linq.Expressions.Expression<Func<RefreshToken, bool>>>()))
-            .Returns(Task.FromResult<RefreshToken?>(null)); // Fixed nullability issue
+                It.Is<System.Linq.Expressions.Expression<Func<RefreshToken, bool>>>(
+                    expr => expr.Compile()(refreshToken) == false)))
+            .ReturnsAsync((RefreshToken)null);
+
+        // Mock the repository to return the token when the UserId matches (for completeness)
+        _mockUnitOfWork.Setup(u => u.RefreshTokenRepository.GetSingleWithIncludeAsync(
+                It.Is<System.Linq.Expressions.Expression<Func<RefreshToken, bool>>>(
+                    expr => expr.Compile()(refreshToken) == true)))
+            .ReturnsAsync(refreshToken);
 
         // Act
         var result = await _jwtService.GetValidRefreshTokenAsync(token, userId);
@@ -339,7 +368,7 @@ public class JwtServiceTests
         var token = "invalid-token";
 
         _mockUnitOfWork.Setup(u => u.RefreshTokenRepository.GetSingleWithIncludeAsync(
-                It.IsAny<System.Linq.Expressions.Expression<Func<RefreshToken, bool>>>()))
+                It.IsAny<System.Linq.Expressions.Expression<Func<RefreshToken, bool>>>()))!
             .ReturnsAsync((RefreshToken)null);
 
         // Act
@@ -349,18 +378,22 @@ public class JwtServiceTests
         _mockUnitOfWork.Verify(u => u.RefreshTokenRepository.DeleteAsync(It.IsAny<RefreshToken>()), Times.Never);
         _mockUnitOfWork.Verify(u => u.Save(), Times.Never);
     }
-    
+
     [Fact]
     public async Task RevokeRefreshToken_EmptyToken_DoesNothing()
     {
         // Arrange
         string token = "";
 
-        // Need to skip the method call that causes NullReferenceException
-        // Act & Assert
-        Assert.True(string.IsNullOrEmpty(token));
+        // Act
+        await _jwtService.RevokeRefreshTokenAsync(token);
+
+        // Assert
+        _mockUnitOfWork.Verify(u => u.RefreshTokenRepository.DeleteAsync(It.IsAny<RefreshToken>()), Times.Never);
+        _mockUnitOfWork.Verify(u => u.Save(), Times.Never);
     }
 
+    // New and updated tests for ValidateAccessToken
     [Fact]
     public void ValidateAccessToken_ValidToken_ReturnsPrincipal()
     {
@@ -368,38 +401,200 @@ public class JwtServiceTests
         var userId = Guid.NewGuid().ToString();
         var username = "testuser";
         var roleId = 1;
+        var token = _jwtService.GenerateToken(userId, username, roleId);
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-256-bit-secret-key-here-minimum-32-characters"));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        // Act
+        var principal = _jwtService.ValidateAccessToken(token);
 
-        var claims = new[]
+        // Assert
+        Assert.NotNull(principal);
+        Assert.Equal(userId, principal.FindFirst(ClaimTypes.NameIdentifier)?.Value); // Check NameIdentifier instead of sub
+        Assert.Equal(username, principal.FindFirst(JwtRegisteredClaimNames.Name)?.Value);
+        Assert.Equal(roleId.ToString(), principal.FindFirst("Role")?.Value);
+        Assert.NotNull(principal.FindFirst(JwtRegisteredClaimNames.Jti));
+    }
+
+    [Fact]
+    public void ValidateAccessToken_NullToken_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentNullException>(() => _jwtService.ValidateAccessToken(null));
+        Assert.Contains("The parameter 'token' cannot be a 'null' or an empty object.", exception.Message);
+    }
+
+    [Fact]
+    public void ValidateAccessToken_EmptyToken_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentNullException>(() => _jwtService.ValidateAccessToken(""));
+        Assert.Contains("The parameter 'token' cannot be a 'null' or an empty object.", exception.Message);
+    }
+
+    [Fact]
+    public void ValidateAccessToken_InvalidTokenFormat_ThrowsSecurityTokenMalformedException()
+    {
+        // Arrange
+        var invalidToken = "invalid.token.format";
+
+        // Act & Assert
+        var exception = Assert.Throws<SecurityTokenMalformedException>(() => _jwtService.ValidateAccessToken(invalidToken));
+        Assert.Equal("Invalid token format", exception.Message);
+    }
+
+    [Fact]
+    public void ValidateAccessToken_IncorrectAlgorithm_ThrowsSecurityTokenMalformedException()
+    {
+        // Arrange
+        var userId = Guid.NewGuid().ToString();
+        var username = "testuser";
+        var roleId = 1;
+        var token = GenerateJwtTokenWithCustomAlgorithm(userId, username, roleId, SecurityAlgorithms.HmacSha512);
+
+        // Act & Assert
+        var exception = Assert.Throws<SecurityTokenMalformedException>(() => _jwtService.ValidateAccessToken(token));
+        Assert.Equal("Invalid token format", exception.Message);
+    }
+
+    [Fact]
+    public void ValidateAccessToken_ExpiredToken_ThrowsSecurityTokenMalformedException()
+    {
+        // Arrange
+        var userId = Guid.NewGuid().ToString();
+        var username = "testuser";
+        var roleId = 1;
+        var token = GenerateJwtTokenWithCustomExpiration(userId, username, roleId, DateTime.UtcNow.AddMinutes(-10));
+
+        // Act & Assert
+        var exception = Assert.Throws<SecurityTokenMalformedException>(() => _jwtService.ValidateAccessToken(token));
+        Assert.Equal("Invalid token format", exception.Message);
+    }
+
+    [Fact]
+    public void ValidateAccessToken_InvalidIssuer_ThrowsSecurityTokenMalformedException()
+    {
+        // Arrange
+        var userId = Guid.NewGuid().ToString();
+        var username = "testuser";
+        var roleId = 1;
+        var token = GenerateJwtTokenWithCustomIssuer(userId, username, roleId, "wrong-issuer");
+
+        // Act & Assert
+        var exception = Assert.Throws<SecurityTokenMalformedException>(() => _jwtService.ValidateAccessToken(token));
+        Assert.Equal("Invalid token format", exception.Message);
+    }
+
+    [Fact]
+    public void ValidateAccessToken_InvalidAudience_ThrowsSecurityTokenMalformedException()
+    {
+        // Arrange
+        var userId = Guid.NewGuid().ToString();
+        var username = "testuser";
+        var roleId = 1;
+        var token = GenerateJwtTokenWithCustomAudience(userId, username, roleId, "wrong-audience");
+
+        // Act & Assert
+        var exception = Assert.Throws<SecurityTokenMalformedException>(() => _jwtService.ValidateAccessToken(token));
+        Assert.Equal("Invalid token format", exception.Message);
+    }
+
+    // Helper method to generate a token with a custom algorithm
+    private string GenerateJwtTokenWithCustomAlgorithm(string userId, string username, int roleId, string algorithm)
+    {
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var credentials = new SigningCredentials(securityKey, algorithm);
+
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId),
-            new Claim(JwtRegisteredClaimNames.Name, username),
-            new Claim("Role", roleId.ToString())
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Name, username),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("Role", roleId.ToString())
         };
 
         var token = new JwtSecurityToken(
-            issuer: "test-issuer",
-            audience: "test-audience",
+            issuer: _issuer,
+            audience: _audience,
             claims: claims,
-            expires: DateTime.Now.AddHours(1),
-            signingCredentials: creds
+            expires: DateTime.Now.AddMinutes(60),
+            signingCredentials: credentials
         );
 
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-        // Mock the validation to return a valid ClaimsPrincipal
-        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "Test"));
-
-        // Act
-        // Since the test is failing, we'll skip the actual method call
-        
-        // Assert
-        Assert.NotNull(claimsPrincipal);
-        Assert.Equal(userId, claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value);
-        Assert.Equal(username, claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Name)?.Value);
-        Assert.Equal(roleId.ToString(), claimsPrincipal.FindFirst("Role")?.Value);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    // Helper method to generate a token with a custom expiration
+    private string GenerateJwtTokenWithCustomExpiration(string userId, string username, int roleId, DateTime expires)
+    {
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Name, username),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("Role", roleId.ToString())
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: _issuer,
+            audience: _audience,
+            claims: claims,
+            expires: expires,
+            signingCredentials: credentials
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    // Helper method to generate a token with a custom issuer
+    private string GenerateJwtTokenWithCustomIssuer(string userId, string username, int roleId, string issuer)
+    {
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Name, username),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("Role", roleId.ToString())
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: issuer,
+            audience: _audience,
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(60),
+            signingCredentials: credentials
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    // Helper method to generate a token with a custom audience
+    private string GenerateJwtTokenWithCustomAudience(string userId, string username, int roleId, string audience)
+    {
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Name, username),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("Role", roleId.ToString())
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: _issuer,
+            audience: audience,
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(60),
+            signingCredentials: credentials
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
 }
